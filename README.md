@@ -5,7 +5,7 @@ Welcome to FairML! FairML is a collection of tools for auditing the data mining/
 FairML
 =====================
 
-<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/logo1.png" width="700">
+<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/logo2.png" width="700">
 
 This repo contains the source code used as part of FAIRML
 
