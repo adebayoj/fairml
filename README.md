@@ -38,7 +38,7 @@ perform audits of black-box algorithms and corresponding
 input data.
 
 Feel free to email the authors with any questions:  
-[Julius Adebayo](http://mlg.eng.cam.ac.uk/Lloyd/) (juliusad@mit.edu)   
+[Julius Adebayo](https://github.com/adebayoj) (juliusad@mit.edu)   
 
 
 ### Data used in the paper
