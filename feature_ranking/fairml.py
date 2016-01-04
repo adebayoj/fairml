@@ -7,6 +7,21 @@ import time
 from subprocess import call
 import time
 from mrmr_wrapper import call_mrmr_routine
+from mrmr_wrapper import remove_mrmr_input_folder_to_clean_up_space
+from lasso_random_forest import obtain_feature_importance_from_rf
+from lasso_random_forest import return_best_rf_regressor
+
+from clean_up_mrmr_output import aggregate_mrmr_results_and_pickle_dictionary
+from clean_up_mrmr_output import write_out_rankings
+from clean_up_mrmr_output import get_list_of_files
+from clean_up_mrmr_output import convert_to_float
+
+import pickle
+
+def purge():
+	#I should double check using this
+	call(["sudo","purge"])
+	return None
 
 def build_parser():
 	parser = ArgumentParser(
@@ -148,12 +163,12 @@ def confirm_input_arguments_and_set_analysis_folders(options):
 
 	print "creating analysis folders"
 	#set up the relevant analysis folders. 
-	folder_paths = create_analysis_folders(options)
+	folder_paths_and_target = create_analysis_folders(options)
 
 	#now write input file for mrmr analysis
 	#ricci_new_df.to_csv(path_or_buf="ricci_data_processed.csv", sep=',', index=False)
 
-	where_to_write_mrmr_input = folder_paths["mrmr_input"] + "/input_file.csv"
+	where_to_write_mrmr_input = folder_paths_and_target["mrmr_input"] + "/input_file.csv"
 	full_input_data.to_csv(path_or_buf=where_to_write_mrmr_input , sep=',', index=False)
 
 	#and the name of target in the csv into the dictionary
@@ -173,9 +188,32 @@ def sample_data_frame_return_x_y(dataframe, contains_y, y_variable_name, num_sam
 		return X, None
 
 def main():
+	now = time.time()
 	options = build_parser()
+	purge()
 	input_data_frame, analysis_file_paths = confirm_input_arguments_and_set_analysis_folders(options)
-	csv_input_mrmr = analysis_file_paths[mrmr_input] + "/input_file.csv"
-	call_mrmr_routine(csv_input_mrmr, analysis_file_paths["target"], analysis_file_paths[mrmr_output]+"/")
+	print "finished writing file to mrmr input"
+	csv_input_mrmr = analysis_file_paths["mrmr_input"] + "/input_file.csv"
+	print "calling mrmr routing now"
+	call_mrmr_routine(csv_input_mrmr, analysis_file_paths["target"], analysis_file_paths["mrmr_output"]+"/")
+	purge()
+	print "done calling mrmr routing now\n\n"
+
+	print "aggregating mrmr output"
+	aggregate_mrmr_results_and_pickle_dictionary(analysis_file_paths["mrmr_output"], analysis_file_paths["ranking_results"])
+	purge()
+
+	print "removing mrmr input folder"
+
+	remove_mrmr_input_folder_to_clean_up_space(analysis_file_paths["mrmr_input"])
+
+	print "now we are on random forest"
+	best_clf, column_list_for_fit_data = return_best_rf_regressor(input_data_frame, analysis_file_paths["target"], 15, 100, 3)
+
+	obtain_feature_importance_from_rf(best_clf, column_list_for_fit_data, analysis_file_paths["ranking_results"])
+
+	print "Entire analysis took ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
+
+
 if __name__ == '__main__':
 	main()
