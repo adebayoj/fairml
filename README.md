@@ -1,6 +1,6 @@
 ========
 
-FairML: A Tool for Auditing Black-Box Predictive Algorithms
+FairML: Auditing Black-Box Predictive Algorithms
 =====================
 Welcome to FairML! FairML is a collection of tools for auditing the data mining/machine learning process including algorithms, and input for bias. 
 
