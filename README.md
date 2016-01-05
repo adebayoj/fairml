@@ -36,6 +36,15 @@ for analysts at government institutions to quickly
 perform audits of black-box algorithms and corresponding
 input data.
 
+### Motivation
+
+<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/overview_of_fairml.png" width="700">
+
+### Example Output
+
+<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/ricci_analysis.png" width="700">
+
+
 Feel free to email the authors with any questions:  
 [Julius Adebayo](https://github.com/adebayoj) (juliusad@mit.edu)   
 
