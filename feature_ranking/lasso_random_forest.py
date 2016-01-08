@@ -1,5 +1,6 @@
 
 import pandas as pd
+import numpy as np
 
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -18,10 +19,25 @@ from sklearn.ensemble import RandomForestClassifier
 from time import time
 from scipy.stats import randint as sp_randint
 
+from sklearn.linear_model import (RandomizedLasso, lasso_stability_path,
+                                  LassoLarsCV)
+from sklearn.feature_selection import f_regression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import auc, precision_recall_curve
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.utils.extmath import pinvh
+from sklearn.utils import ConvergenceWarning
+
 import pickle
 
 import sys
 import os
+
+def scale_input_data(X):
+	 scaler = StandardScaler()
+	 scaler.fit(X)
+	 X = scaler.transform(X.copy())
+	 return X, scaler
 
 def sample_data_frame_return_x_y_rf_file(dataframe, contains_y, y_variable_name, num_samples):
 	if contains_y:
@@ -86,6 +102,9 @@ def return_best_rf_regressor(df, target, num_trees_hyperparameter, num_trees_fin
 
 def obtain_feature_importance_from_rf(clf, column_names, file_path):
 	feature_importance = clf.feature_importances_
+
+	std = np.std([tree.feature_importances_ for tree in clf.estimators_],
+             axis=0)
 	print "######################################################"
 	print feature_importance
 	print "######################################################"
@@ -97,8 +116,8 @@ def obtain_feature_importance_from_rf(clf, column_names, file_path):
 
 	random_forest_combine_dict = {}
 	for i in range(len(column_names)):
-		print column_names[i] + " ------>>>> " + str(feature_importance[i])
-		random_forest_combine_dict[column_names[i]] = feature_importance[i]
+		print column_names[i] + " ------>>>> " + str(feature_importance[i]), str(std[i])
+		random_forest_combine_dict[column_names[i]] = (feature_importance[i], std[i])
 
 	pickle_path = file_path + "/random_forest_feature_ranking.pickle"
 
@@ -106,6 +125,80 @@ def obtain_feature_importance_from_rf(clf, column_names, file_path):
   		pickle.dump(random_forest_combine_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
   	return "Pickled random forest rankings"
+
+
+def run_lasso_on_input(df, target):
+   
+	X_part, y_part, _ = sample_data_frame_return_x_y_rf_file(df, True, target, int(0.7*df.shape[0]))
+
+	X_part, _ = scale_input_data(X_part)
+
+	print "#######################################"
+	print "Starting LARS CV"
+	print "#######################################"
+
+	lars_cv = LassoLarsCV(cv=10).fit(X_part, y_part)
+
+	print "#######################################"
+	print "Done with LARS CV"
+	print "#######################################"
+
+	#alphas = np.linspace(lars_cv.alphas_[0], .1 * lars_cv.alphas_[0], 6)
+	
+	X, y, column_list_for_sampled = sample_data_frame_return_x_y_rf_file(df, True, target, df.shape[0])
+
+	X, _ = scale_input_data(X)
+
+	print "#######################################"
+	print "Starting main lasso"
+	print "#######################################"
+
+	clf = RandomizedLasso(alpha= lars_cv.alphas_, random_state=12, n_resampling= 400, normalize=True).fit(X, y) 
+
+	print "#######################################"
+	print "Done with main lasso"
+	print "#######################################"
+
+	return clf, column_list_for_sampled
+
+def obtain_feature_importance_from_lasso(clf, column_names, file_path):
+	feature_importance = clf.scores_
+
+	total_scores_for_all_features = clf.all_scores_
+	mean_scores = np.mean(total_scores_for_all_features, axis = 1)
+	std_scores = np.std(total_scores_for_all_features, axis=1)
+
+	#check if the len(mean_scores and )
+	if len(mean_scores) != len(std_scores):
+		raise "Length of mean vector different from length of std vector for Lasso \
+				This means that the vector of coefficients from Lasso was improperly handled"
+
+	if (len(mean_scores)) != len(column_names):
+		print "length of columns --->>" + str(len(mean_scores))
+		print "length of feature names --->>" + str(len(column_names))
+		raise "Length of feature scores returned is not the same as the length of name columns"
+
+	complete_feature_importance_dictionary = {}
+	for i in range(len(mean_scores)):
+		complete_feature_importance_dictionary[column_names[i]] = (mean_scores[i], std_scores[i])
+
+	print "########################################"
+	print "Pickling Feature Importance Dictionary"
+	print "########################################"
+
+
+	print complete_feature_importance_dictionary
+
+	file_path_to_pickle = file_path + "/lasso_feature_ranking.pickle"
+
+	print "File path to write pickle file --->>>> " + file_path_to_pickle
+
+	with open(file_path_to_pickle, 'wb') as handle2:
+		pickle.dump(complete_feature_importance_dictionary, handle2, protocol=pickle.HIGHEST_PROTOCOL)
+
+	return "Finished Pickling lasso ranking."
+
+
 
 
 
