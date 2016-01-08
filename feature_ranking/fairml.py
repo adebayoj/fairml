@@ -10,6 +10,8 @@ from mrmr_wrapper import call_mrmr_routine
 from mrmr_wrapper import remove_mrmr_input_folder_to_clean_up_space
 from lasso_random_forest import obtain_feature_importance_from_rf
 from lasso_random_forest import return_best_rf_regressor
+from lasso_random_forest import run_lasso_on_input
+from lasso_random_forest import obtain_feature_importance_from_lasso
 
 from clean_up_mrmr_output import aggregate_mrmr_results_and_pickle_dictionary
 from clean_up_mrmr_output import write_out_rankings
@@ -17,6 +19,7 @@ from clean_up_mrmr_output import get_list_of_files
 from clean_up_mrmr_output import convert_to_float
 
 import pickle
+import logging
 
 def purge():
 	#I should double check using this
@@ -71,7 +74,6 @@ def create_analysis_folders(options):
 
 	text_for_read_me = "This folder includes results for the analysis of the file {0}. \
 						This analysis was conducted by FairML at {1}.".format(options.input_file, now_date_format)
-
 
 	#create the names of the folders
 	mrmr_output = name_of_folder + "/mrmr_output"
@@ -197,7 +199,7 @@ def main():
 	print "calling mrmr routing now"
 	call_mrmr_routine(csv_input_mrmr, analysis_file_paths["target"], analysis_file_paths["mrmr_output"]+"/")
 	purge()
-	print "done calling mrmr routing now\n\n"
+	print "done calling mrmr routing now\n"
 
 	print "aggregating mrmr output"
 	aggregate_mrmr_results_and_pickle_dictionary(analysis_file_paths["mrmr_output"], analysis_file_paths["ranking_results"])
@@ -206,12 +208,26 @@ def main():
 	print "removing mrmr input folder"
 
 	remove_mrmr_input_folder_to_clean_up_space(analysis_file_paths["mrmr_input"])
+	purge()
 
 	print "now we are on random forest"
 	best_clf, column_list_for_fit_data = return_best_rf_regressor(input_data_frame, analysis_file_paths["target"], 15, 100, 3)
+	purge()
 
 	obtain_feature_importance_from_rf(best_clf, column_list_for_fit_data, analysis_file_paths["ranking_results"])
+	purge()
 
+	print "fitting lasso"
+	clf, column_list = run_lasso_on_input(input_data_frame, analysis_file_paths["target"])
+	purge()
+
+	print "Fitting Lasso took  ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
+
+	print "Now print feature importance"
+
+	obtain_feature_importance_from_lasso(clf, column_list, analysis_file_paths["ranking_results"])
+	purge()
+	
 	print "Entire analysis took ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
 
 
