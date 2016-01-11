@@ -28,26 +28,14 @@ from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.utils.extmath import pinvh
 from sklearn.utils import ConvergenceWarning
 
+from utils import sample_data_frame_return_x_y_column_name
+from utils import scale_input_data
+
 import pickle
 
 import sys
 import os
 
-def scale_input_data(X):
-	 scaler = StandardScaler()
-	 scaler.fit(X)
-	 X = scaler.transform(X.copy())
-	 return X, scaler
-
-def sample_data_frame_return_x_y_rf_file(dataframe, contains_y, y_variable_name, num_samples):
-	if contains_y:
-		new_dataframe = dataframe.sample(n=num_samples)
-		y = new_dataframe[y_variable_name].values
-		new_dataframe.drop([y_variable_name],inplace=True, axis=1)
-		column_list = list(new_dataframe.columns)
-		return new_dataframe.values, y, column_list
-	else:
-		raise "Input file to sample should always contain the y variable. "
 
 def hyperparameter_search_random(X, y, clf, dict_params, num_iterations):
 	random_search = RandomizedSearchCV(clf, param_distributions=dict_params, n_iter=num_iterations, verbose = 2)
@@ -72,7 +60,7 @@ def return_best_rf_regressor(df, target, num_trees_hyperparameter, num_trees_fin
 
 	print "Sample dataframe"
 	#use
-	X, y, column_list_for_sampled = sample_data_frame_return_x_y_rf_file(df, True, target, num_samples)
+	X, y, column_list_for_sampled = sample_data_frame_return_x_y_column_name(df, True, target, num_samples)
 
 	# figure out a vary this some how
 	"""
@@ -89,9 +77,9 @@ def return_best_rf_regressor(df, target, num_trees_hyperparameter, num_trees_fin
 	print "starting hyperparameter search"
 	clf_best, best_params = hyperparameter_search_random(X, y, clf, param_dist, num_iterations)
 
-	print "fitting model"
+	print "sample data for fitting model"
     #train new classifier on the entire dataset
-	X, y, column_list_for_sampled = sample_data_frame_return_x_y_rf_file(df, True, target, num_samples=df.shape[0])
+	X, y, column_list_for_sampled = sample_data_frame_return_x_y_column_name(df, True, target, num_samples=df.shape[0])
 
 	clf_final = RandomForestRegressor(n_estimators=num_trees_final_clf, max_depth = best_params["max_depth"], min_samples_leaf = best_params["min_samples_leaf"],  min_samples_split = best_params["min_samples_split"], bootstrap = best_params["bootstrap"], max_features = best_params["max_features"])
 
@@ -129,7 +117,7 @@ def obtain_feature_importance_from_rf(clf, column_names, file_path):
 
 def run_lasso_on_input(df, target):
    
-	X_part, y_part, _ = sample_data_frame_return_x_y_rf_file(df, True, target, int(0.7*df.shape[0]))
+	X_part, y_part, _ = sample_data_frame_return_x_y_column_name(df, True, target, int(0.7*df.shape[0]))
 
 	X_part, _ = scale_input_data(X_part)
 
@@ -145,7 +133,7 @@ def run_lasso_on_input(df, target):
 
 	#alphas = np.linspace(lars_cv.alphas_[0], .1 * lars_cv.alphas_[0], 6)
 	
-	X, y, column_list_for_sampled = sample_data_frame_return_x_y_rf_file(df, True, target, df.shape[0])
+	X, y, column_list_for_sampled = sample_data_frame_return_x_y_column_name(df, True, target, df.shape[0])
 
 	X, _ = scale_input_data(X)
 

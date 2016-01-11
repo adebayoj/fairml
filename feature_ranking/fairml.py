@@ -18,8 +18,26 @@ from clean_up_mrmr_output import write_out_rankings
 from clean_up_mrmr_output import get_list_of_files
 from clean_up_mrmr_output import convert_to_float
 
+from utils import transform_column_float
+from utils import sample_data_frame_return_x_y_column_name
+from utils import pickle_this_variable_with_this_name_to_this_folder
+
+from orthogonal_projection import orthogonal_variable_selection_cannot_query_black_box
+from orthogonal_projection import aggregate_orthogonal_rankings
+
+from graphing_results import *
+
+
 import pickle
 import logging
+
+from multiprocessing import Process
+
+"""
+in fairness rating folder 
+
+python fairml.py --file=../data/processed_data_sets/turkey_credit_individual_data_with_pd_limit.csv --target=credit_limit
+"""
 
 def purge():
 	#I should double check using this
@@ -56,13 +74,6 @@ def build_parser():
 	options = parser.parse_args()
 	return options
 
-def transform_column_float(x):
-	try:
-		return float(x)
-	except:
-		print "Input file contains characters that can't be converted to float, pls double \
-			the input file"
-		raise
 
 def create_analysis_folders(options):
 
@@ -157,7 +168,7 @@ def confirm_input_arguments_and_set_analysis_folders(options):
 	print "converting all columns to floats"
 	#now convert all the columns to float64
 	for name in column_names:
-		print "we are working with {0} now".format(name)
+		#print "we are working with {0} now".format(name)
 		if full_input_data[name].dtype != float:
 			full_input_data[name] = full_input_data[name].map(transform_column_float)
 
@@ -171,65 +182,143 @@ def confirm_input_arguments_and_set_analysis_folders(options):
 	#ricci_new_df.to_csv(path_or_buf="ricci_data_processed.csv", sep=',', index=False)
 
 	where_to_write_mrmr_input = folder_paths_and_target["mrmr_input"] + "/input_file.csv"
-	full_input_data.to_csv(path_or_buf=where_to_write_mrmr_input , sep=',', index=False)
+	
+	no_columns_in_df = full_input_data.shape[1]
+
+
+	new_column_name = ['feature'+str(i) for i in range(no_columns_in_df)]
+	new_full_input_data = full_input_data.copy()
+	new_full_input_data.columns = new_column_name
+
+	original_columns = list(full_input_data.columns)
+
+	mapping_for_new_columns_names = {}
+	for i in range(len(new_column_name)):
+		mapping_for_new_columns_names[new_column_name[i]] = original_columns[i]
+
+	#write out mapping to ranking
+	mapping_name = "mrmr_column_feature_name_mapping.pickle"
+	pickle_this_variable_with_this_name_to_this_folder(mapping_for_new_columns_names, folder_paths_and_target["ranking_results"] + "/" + mapping_name)
+
+	new_full_input_data.to_csv(path_or_buf=where_to_write_mrmr_input , sep=',', index=False)
+
+	#target name mrmr
+	
+	folder_paths_and_target["target_mrmr"] = new_column_name[original_columns.index(target_name_in_csv)]
 
 	#and the name of target in the csv into the dictionary
 	folder_paths_and_target["target"] = target_name_in_csv
+
+	print "target name is " + folder_paths_and_target["target"]
+	print "mrmr target name is " + folder_paths_and_target["target_mrmr"]
 	return full_input_data, folder_paths_and_target
 
 
-def sample_data_frame_return_x_y(dataframe, contains_y, y_variable_name, num_samples):
+def run_mrmr_on_input_data_set(input_data_frame, options, analysis_file_paths):
+	now = time.time()
+	print "#######################################"
+	print "Starting MRMR"
+	print "#######################################"
+	csv_input_mrmr = analysis_file_paths["mrmr_input"] + "/input_file.csv"
+	call_mrmr_routine(csv_input_mrmr, analysis_file_paths["target_mrmr"], analysis_file_paths["mrmr_output"]+"/")
+	aggregate_mrmr_results_and_pickle_dictionary(analysis_file_paths["mrmr_output"], analysis_file_paths["ranking_results"])
+	#remove_mrmr_input_folder_to_clean_up_space(analysis_file_paths["mrmr_input"])
+	print "Fitting MRMR and clean up took  ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
 
-	if contains_y:
-		new_dataframe = dataframe.sample(n=num_samples)
-		y = new_dataframe[y_variable_name].values
-		X = new_dataframe.drop([y_variable_name],inplace=True, axis=1).values
-		return X, y
-	else:
-		new_dataframe = dataframe.sample(n=num_samples)
-		return X, None
+
+def run_random_forest_on_input_data_set(input_data_frame, options, analysis_file_paths, num_trees_hyperparameter, num_trees_final_clf, num_iterations):
+	now = time.time()
+	print "#######################################"
+	print "Starting RANDOM FOREST"
+	print "#######################################"
+
+	#return_best_rf_regressor(df, target, num_trees_hyperparameter, num_trees_final_clf, num_iterations)
+	#obtain_feature_importance_from_rf(clf, column_names, file_path)
+
+	best_clf, column_list_for_fit_data = return_best_rf_regressor(input_data_frame, analysis_file_paths["target"], num_trees_hyperparameter, num_trees_final_clf, num_iterations)
+	obtain_feature_importance_from_rf(best_clf, column_list_for_fit_data, analysis_file_paths["ranking_results"])
+	print "Fitting Random Forest and clean up took  ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
+
+def run_lasso_on_input_data_set(input_data_frame, analysis_file_paths):
+	now = time.time()
+	print "#######################################"
+	print "Starting RANDOM FOREST"
+	print "#######################################"
+
+	clf, column_list = run_lasso_on_input(input_data_frame, analysis_file_paths["target"])
+	obtain_feature_importance_from_lasso(clf, column_list, analysis_file_paths["ranking_results"])
+	print "Fitting Lasso and clean up took  ----->>> " +  str(float(time.time() - now)/60.0) + " minutes!"
+
+def run_orthogonal_ranking_no_black_box_on_input_data_set(input_data_frame, analysis_file_paths, non_linear, no_bootstrap_iter):
+
+	#set number of samples
+
+	num_samples = input_data_frame.shape[0]
+
+	if (num_samples > 100000) :
+		num_samples = 100000
+
+	if non_linear > 0:
+		if input_data_frame.shape[0] > 5000:
+			num_samples = 5000
+
+	#orthogonal_variable_selection_cannot_query_black_box(df, target, non_linear, no_bootstrap_iter, num_samples)
+	orthogonal_results = orthogonal_variable_selection_cannot_query_black_box(input_data_frame, analysis_file_paths["target"], non_linear, no_bootstrap_iter, num_samples)
+	print_result = aggregate_orthogonal_rankings(orthogonal_results, analysis_file_paths["ranking_results"])
+
+	print "Finished Running Orthogonal Transformation"
 
 def main():
 	now = time.time()
 	options = build_parser()
 	purge()
 	input_data_frame, analysis_file_paths = confirm_input_arguments_and_set_analysis_folders(options)
-	print "finished writing file to mrmr input"
-	csv_input_mrmr = analysis_file_paths["mrmr_input"] + "/input_file.csv"
-	print "calling mrmr routing now"
-	call_mrmr_routine(csv_input_mrmr, analysis_file_paths["target"], analysis_file_paths["mrmr_output"]+"/")
-	purge()
-	print "done calling mrmr routing now\n"
 
-	print "aggregating mrmr output"
-	aggregate_mrmr_results_and_pickle_dictionary(analysis_file_paths["mrmr_output"], analysis_file_paths["ranking_results"])
-	purge()
+	font = {'family': 'Serif',
+        'color':  'Black',
+        'weight': 'normal',
+        'size': 13,
+        }
 
-	print "removing mrmr input folder"
-
-	remove_mrmr_input_folder_to_clean_up_space(analysis_file_paths["mrmr_input"])
-	purge()
-
-	print "now we are on random forest"
-	best_clf, column_list_for_fit_data = return_best_rf_regressor(input_data_frame, analysis_file_paths["target"], 15, 100, 3)
-	purge()
-
-	obtain_feature_importance_from_rf(best_clf, column_list_for_fit_data, analysis_file_paths["ranking_results"])
-	purge()
-
-	print "fitting lasso"
-	clf, column_list = run_lasso_on_input(input_data_frame, analysis_file_paths["target"])
-	purge()
-
-	print "Fitting Lasso took  ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
-
-	print "Now print feature importance"
-
-	obtain_feature_importance_from_lasso(clf, column_list, analysis_file_paths["ranking_results"])
-	purge()
+	title_font = {'family': 'Serif',
+        'color':  'Black',
+        'weight': 'semibold',
+        'size': 15,
+        }
 	
-	print "Entire analysis took ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
+	#calling random forest 
+	#I should add this to the input arguments
+	num_trees_hyperparameter = 15
+	num_trees_final_clf = 100
+	num_iterations_rf = 3
 
+	no_bootstrap_orthogonal_ranking = 1
+	orthogonal_non_linear = 0 #if non_linear > 0, then it does non linear version. 
+
+	#calling mrmr
+	run_mrmr_on_input_data_set(input_data_frame, options, analysis_file_paths)
+	purge()
+
+	#run_random_forest_on_input_data_set(input_data_frame, options, analysis_file_paths, num_trees_hyperparameter, num_trees_final_clf, num_iterations)
+	run_random_forest_on_input_data_set(input_data_frame, options, analysis_file_paths, num_trees_hyperparameter , num_trees_final_clf, num_iterations_rf)
+	purge()
+
+	#call lasso
+	run_lasso_on_input_data_set(input_data_frame, analysis_file_paths)
+	purge()
+
+	#call orthogonal feature transformation
+	run_orthogonal_ranking_no_black_box_on_input_data_set(input_data_frame, analysis_file_paths, orthogonal_non_linear, no_bootstrap_orthogonal_ranking)
+	purge()
+
+	print "Entire analysis took ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
+	now = time.time()
+	#now call the graphing components
+	run_graphing_module(analysis_file_paths["ranking_results"], analysis_file_paths["plots"], \
+					(10, 10), ["male", "female"], analysis_file_paths["target"], font, title_font)
+	purge()
+
+	print "Plotting took ------>>> " + str(float(time.time() - now)/60.0) + " minutes!"
 
 if __name__ == '__main__':
 	main()

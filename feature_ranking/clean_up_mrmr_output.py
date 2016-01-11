@@ -4,6 +4,8 @@ import subprocess
 import csv
 import pickle
 
+import numpy as np
+
 #simple float conversion function
 def convert_to_float(x):
 	try:
@@ -27,6 +29,7 @@ def write_out_rankings(file_path_to_mrmr_output):
 	rankings_dict = {}
 	scores = {}
 	master_dictionary = {}
+	complete_master_dictionary = {}
 
 	for current_file in list_of_files:
 		full_file_path = file_path_to_mrmr_output + "/" + current_file
@@ -63,15 +66,18 @@ def write_out_rankings(file_path_to_mrmr_output):
 		else:
 			print "random file found  " + str(current_file)
 
-	#initialize master dictionary
+	#initialize master dictionaries
 	for key in features_index_list:
-		master_dictionary[features_index_list[key]] = 0.0
+		master_dictionary[features_index_list[key]] = []
 
-	print scores
+	for key in features_index_list:
+		complete_master_dictionary[features_index_list[key]] = tuple()
 
-	print "#####################################"
+	#print scores
 
-	print rankings_dict
+	#print "#####################################"
+
+	#print rankings_dict
 
 	for number_run in rankings_dict:
 
@@ -81,14 +87,16 @@ def write_out_rankings(file_path_to_mrmr_output):
 			variable_name = features_index_list[current_rank]
 
 			#now update master dictionary
-			master_dictionary[variable_name] += current_score
+			master_dictionary[variable_name].append(current_score)
 
-	print str(len(rankings_dict)) + " <<---------- length of ranking dictionary"
+	#print str(len(rankings_dict)) + " <<---------- length of ranking dictionary"
 	#scale each score
+
 	for key in master_dictionary:
-		master_dictionary[key] = master_dictionary[key]/len(rankings_dict)
+		mean, std = np.mean(np.array(master_dictionary[key])), np.std(np.array(master_dictionary[key]))
+		complete_master_dictionary[key] =  (mean, std)
 		
-	return master_dictionary
+	return complete_master_dictionary
 
 def aggregate_mrmr_results_and_pickle_dictionary(file_path_to_mrmr_output, file_path_to_rankings):
 
@@ -96,7 +104,7 @@ def aggregate_mrmr_results_and_pickle_dictionary(file_path_to_mrmr_output, file_
 
 	pickle_path = file_path_to_rankings + "/mrmr_feature_ranking.pickle"
 
-	with open(pickle_path, 'wb', ) as handle:
+	with open(pickle_path, 'wb') as handle:
   		pickle.dump(output_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
   	return "Pickled mrmr feature rankings"
