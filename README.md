@@ -38,7 +38,7 @@ input data.
 
 ### Motivation
 
-<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/overview_of_fairml.png" width="700">
+<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/fairml_architecture" width="700">
 
 ### Example Output
 
