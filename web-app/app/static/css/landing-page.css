@@ -170,3 +170,40 @@ footer {
 p.copyright {
     margin: 15px 0 0;
 }
+
+.overview_section {
+    padding: 50px 0;
+    background-color: #f8f8f8;
+}
+
+.img-responsive{
+    top:130px;
+    bottom:0;
+    margin:auto;
+    padding-top: 90px;
+    width:800px; /* you can use % */
+    height: 550;
+}
+
+.team_avatar_img{
+    width:200px;
+    height: auto;
+}
+
+.demo_class{
+        padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
+    padding-bottom: 50px;
+    text-align: center;
+    color: #FFFFFF;
+    background: url(../img/demo_bg_pic.png ) no-repeat center center;
+    background-size: cover;
+    font-weight: bolder;
+    font-size: 2em;
+}
+
+input[type=file] {
+    display: block;
+    margin: 0 auto;
+    padding-bottom: 1em;
+}
+
