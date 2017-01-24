@@ -1,4 +1,6 @@
-import numpy
+import numpy as np
+import pandas as pd
+import sys
 
 
 def verify_black_box_estimator(estimator, number_of_features,
@@ -18,7 +20,7 @@ def verify_black_box_estimator(estimator, number_of_features,
     covariance = np.eye(number_of_features)
     mean = np.zeros(number_of_features)
 
-    data = np.random.multivariate_normal(mean, cov,
+    data = np.random.multivariate_normal(mean, covariance,
                                          number_of_data_points)
 
     try:
@@ -40,6 +42,12 @@ def verify_black_box_estimator(estimator, number_of_features,
 
     return True
 
+
+def verify_input_data(input_dataframe):
+
+    pass
+
+
 """
 class BlackBoxModel(object):
 
@@ -56,9 +64,9 @@ class BlackBoxModel(object):
 
 """
 
-def main:
+
+def main():
     pass
 
 if __name__ == '__main__':
     main()
-
