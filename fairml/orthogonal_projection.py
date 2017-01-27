@@ -18,6 +18,4 @@ def audit_model(estimator, sample_dataframe, classifier=False,
     #perform the straight forward linear search at fist
 
 
-
-
     pass
