@@ -65,11 +65,12 @@ def verify_input_data(input_dataframe):
               "appropriately.")
         raise
 
-    #no input values, now check column names
+    # no input values, now check column names
     return True, list(input_dataframe.columns)
 
+
 def verify_external_dataframe(input_dataframe, external_dataframe):
-        pass
+    pass
 
 
 def main():
