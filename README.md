@@ -2,7 +2,7 @@
 
 FairML: Auditing Black-Box Predictive Models
 =====================
-Welcome to FairML! FairML is a collection of tools for auditing the data mining/machine learning process including algorithms, and input for bias. 
+FairML is a python toolbox auditing the machine learning models for bias. 
 
 <img src="https://raw.githubusercontent.com/adebayoj/fairml/master/doc/images/logo2.png" width="700">
 
@@ -16,9 +16,9 @@ services such as credit, insurance, and employment. Despite societal gains in ef
 and productivity through deployment of these models, potential systemic flaws have
 not been fully addressed, particularly the potential for unintentional discrimination.
 This discrimination could be on the basis of race, gender, religion, sexual orientation,
-or other characteristics. This thesis addresses the question: how can an analyst
+or other characteristics. This SM thesis project addresses the question: how can an analyst
 determine the relative significance of the inputs to a black-box predictive model in order
-to assess the model’s fairness (or discriminatory extent)? We present FairML, an endto-
+to assess the model’s fairness (or discriminatory extent)? We present FairML, an end-to-
 end toolbox for auditing predictive models by quantifying the relative significance
 of the model’s inputs. FairML leverages model compression and four input ranking
 algorithms to quantify a model’s relative predictive dependence on its inputs. The
