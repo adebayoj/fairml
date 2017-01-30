@@ -34,6 +34,37 @@ def accuracy(y, y_hat):
 
     return accuracy
 
+
+def replace_column_of_matrix(X, column_number, random_sample,
+                             perturbation_strategy="constant-median"):
+    """
+    Arguments: data matrix, n X k
+    random sample: row of data matrix, 1 X k
+    column number: 0 <-> k-1
+
+    replace all elements of X[column number] X with random_sample[column_number]
+    """
+
+    # need to implement random permutation.
+
+    if column_number >= random_sample.shape[0]:
+        raise ValueError("column {} entered. Column # should be"
+                         "less than {}".format(column_number, random_sample.shape[0]))
+
+    if perturbation_strategy == "constant-zero":
+        value_chosen = 0.0
+    elif perturbation_strategy == "constant-median":
+        value_chosen = np.median(X[:, column_number])
+    else:
+        value_chosen = random_sample[column_number]
+
+    constant_array = np.repeat(value_chosen, X.shape[0])
+
+    X[:, column_number] = constant_array
+
+    return X
+
+
 def main():
     pass
 

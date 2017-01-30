@@ -68,22 +68,8 @@ def verify_input_data(input_dataframe):
     #no input values, now check column names
     return True, list(input_dataframe.columns)
 
-
-"""
-class BlackBoxModel(object):
-
-    def __init__(self, estimator, number_of_features,
-                 Regressor=True, Classifier=False):
+def verify_external_dataframe(input_dataframe, external_dataframe):
         pass
-        # check that the estimator is callable.
-
-    def make_predictions(self, numpy_array_of_input):
-
-        output = estimator.predict(numpy_array_of_input)
-
-        return output
-
-"""
 
 
 def main():
