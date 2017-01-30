@@ -30,15 +30,15 @@ input data.
 ### Motivation
 
 
-<img src="https://github.com/adebayoj/fairml/blob/updated_dev_fairml/doc/images/fairml_architecture.png" width="700">
+<img src="https://github.com/adebayoj/fairml/blob/master/doc/images/fairml_architecture.png" width="700">
 
 ### Example Output
 
-<img src="https://raw.githubusercontent.com/adebayoj/FairML/master/doc/images/ricci_analysis.png" width="700">
+<img src="https://raw.githubusercontent.com/adebayoj/fairml/master/doc/images/ricci_analysis.png" width="700">
 
 
 Feel free to email the authors with any questions:  
-[Julius Adebayo](https://github.com/adebayoj) (juliusad@mit.edu)   
+[Julius Adebayo](https://github.com/adebayoj) (julius.adebayo@gmail.com)   
 
 
 ### Data used in the paper
