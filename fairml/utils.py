@@ -33,3 +33,9 @@ def accuracy(y, y_hat):
     accuracy = np.sum(equal)/y.shape[0]
 
     return accuracy
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()

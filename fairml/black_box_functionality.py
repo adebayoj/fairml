@@ -44,8 +44,29 @@ def verify_black_box_estimator(estimator, number_of_features,
 
 
 def verify_input_data(input_dataframe):
+    """
+    This function assumes the black box estimator is working as required. 
+    Checks the dataframe to make sure there are no NANs. 
 
-    pass
+    Will extend to just read a csv in the future. 
+
+    returns :- list of columns (feature names)
+    """
+
+    # first check that it is a dataframe.
+    if type(input_dataframe).__module__ != 'pandas.core.frame':
+        print("Input data is not a dataframe. Make sure input data is of type"
+              "pandas.core.frame")
+        raise
+
+    # now we know input is a dataframe, let's check for null values
+    if input_dataframe.isnull().any().sum() > 0:
+        print("Input data contains some null values. Please check and handle"
+              "appropriately.")
+        raise
+
+    #no input values, now check column names
+    return True, list(input_dataframe.columns)
 
 
 """
