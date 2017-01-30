@@ -1,15 +1,9 @@
 import os
-from collection import defaultdict
+from collections import defaultdict
 from random import randrange, uniform, randint
 
-from utils import mse
-from utils import accuracy
-from utils import replace_column_of_matrix
-
-
-from black_box_funtionality import verify_black_box_estimator
-from black_box_funtionality import verify_input_data
-
+from . import utils
+from . import black_box_functionality
 
 def get_parallel_vector(v1, v2):
     """
@@ -199,3 +193,10 @@ def audit_model(estimator, input_dataframe, problem_class="regression",
                 list_of_column_names[col]].append(total_difference)
 
     return complete_perturbation_dictionary, direct_pertubation_feature_output_dictionary
+
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
