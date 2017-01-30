@@ -27,7 +27,7 @@ the fairness (or discriminatory extent) of such a model. With FairML, analysts c
 more easily audit cumbersome predictive models that are difficult to interpret.s of black-box algorithms and corresponding
 input data.
 
-### Motivation
+### Methodology
 
 
 <img src="https://github.com/adebayoj/fairml/blob/master/doc/images/fairml_methodology_picture.png" width="700">

@@ -1,8 +1,9 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+import numpy as np 
 
 #import specific projection format. 
-from fairml import orthogonal_projection
+from fairml import audit_model
 
 #read in propublica data
 propublica_data = pd.read_csv(filepath_or_buffer="./doc/example_notebooks/propublica_data_for_fairml.csv", sep=",",
@@ -23,9 +24,11 @@ print(list(propublica_data.columns))
 
 #call 
 total, _ = audit_model(clf, propublica_data,
-                       problem_class="classification",
+                       distance_metric="regression",
                        direct_input_pertubation="constant median",
                        number_of_runs=10,
                        include_interactions=False,
                        external_data_set=None)
 
+for key in total:
+    print(key + " --->> " + str(np.median(np.array(total[key]))))

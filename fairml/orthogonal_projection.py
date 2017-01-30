@@ -1,9 +1,17 @@
 import os
+import numpy as np
 from collections import defaultdict
 from random import randrange, uniform, randint
 
-from . import utils
-from . import black_box_functionality
+# import a few utility functions
+from .utils import mse
+from .utils import accuracy
+from .utils import replace_column_of_matrix
+
+# black_box_functionality has functions to verify inputs.
+from .black_box_functionality import verify_black_box_estimator
+from .black_box_functionality import verify_input_data
+
 
 def get_parallel_vector(v1, v2):
     """
@@ -90,16 +98,16 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
     return X
 
 
-def audit_model(estimator, input_dataframe, problem_class="regression",
+def audit_model(estimator, input_dataframe, distance_metric="mse",
                 direct_input_pertubation="constant median",
-                number_of_runs=10, include_interactions=False,
+                number_of_runs=5, include_interactions=False,
                 external_data_set=None):
     """
     Estimator -> Black-box function that has a predict method
 
     input_dataframe -> dataframe with shape (n_samples, n_features)
 
-    problem_class -> one of ["regression", "classification], this 
+    distance_metric -> one of ["mse", "accuracy"], this 
                 variable defaults to regression. 
 
     direct_input_pertubation -> This is referring to how to zero out a 
@@ -130,7 +138,7 @@ def audit_model(estimator, input_dataframe, problem_class="regression",
     complete_perturbation_dictionary = defaultdict(list)
 
     # check if estimator has predict function
-    number_of_features = sample_dataframe.shape[1]
+    number_of_features = input_dataframe.shape[1]
 
     # if check then test estimator for prediction and numpy variable return.
     # It'll raise errors if there are issues with passed in estimator.
@@ -139,15 +147,17 @@ def audit_model(estimator, input_dataframe, problem_class="regression",
     # verify data set and black_box editor.
     _, list_of_column_names = verify_input_data(input_dataframe)
 
+    print(list_of_column_names)
+
     # convert data to numpy array
-    data = input_dataframe.values()
+    data = input_dataframe.values
 
     # get the normal output
     normal_black_box_output = estimator.predict(data)
 
     # perform the straight forward linear search at first
     for current_iteration in range(number_of_runs):
-
+        
         random_row_to_select = randint(0, data.shape[0]-1)
         random_sample_selected = data[random_row_to_select, :]
 
@@ -163,7 +173,7 @@ def audit_model(estimator, input_dataframe, problem_class="regression",
 
             output_constant_col = estimator.predict(data_col_ptb)
 
-            if problem_class == "classification":
+            if distance_metric == "accuracy":
                 output_difference_col = accuracy(
                     output_constant_col, normal_black_box_output)
             else:
@@ -182,7 +192,7 @@ def audit_model(estimator, input_dataframe, problem_class="regression",
 
             total_transformed_output = estimator.predict(total_ptb_data)
 
-            if problem_class == "classification":
+            if distance_metric == "accuracy":
                 total_difference = accuracy(
                     total_transformed_output, normal_black_box_output)
             else:
