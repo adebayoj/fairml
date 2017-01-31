@@ -1,16 +1,28 @@
-import os
 import numpy as np
+import pandas as pd
 from collections import defaultdict
-from random import randrange, uniform, randint
+from random import randint
+import six
 
 # import a few utility functions
 from .utils import mse
 from .utils import accuracy
 from .utils import replace_column_of_matrix
+from .utils import constant_median
 
 # black_box_functionality has functions to verify inputs.
 from .black_box_functionality import verify_black_box_estimator
 from .black_box_functionality import verify_input_data
+
+
+class AuditResult(dict):
+    def __repr__(self):
+        output = []
+        for key, value in self.items():
+            importance = np.median(np.array(value))
+            output.append("Feature: {},\t Importance: {}"
+                          .format(key, importance))
+        return "\n".join(output)
 
 
 def get_parallel_vector(v1, v2):
@@ -30,13 +42,11 @@ def get_parallel_vector(v1, v2):
     # check that the two vectors are the same length
     v1 = np.array(v1)
     v2 = np.array(v2)
-
     if v1.shape[0] != v2.shape[0]:
         return "Error, both vectors are not of the same length"
 
     scaling = np.dot(v1, v2)/np.dot(v1, v1)
     parallel_v2 = (scaling * v1)
-
     return parallel_v2
 
 
@@ -57,13 +67,11 @@ def get_orthogonal_vector(v1, v2):
     # check that the two vectors are the same length
     v1 = np.array(v1)
     v2 = np.array(v2)
-
     if v1.shape[0] != v2.shape[0]:
         return "Error, both vectors are not of the same length"
 
     scaling = np.dot(v1, v2)/np.dot(v1, v1)
     orthogonal_v2 = v2 - (scaling * v1)
-
     return orthogonal_v2
 
 
@@ -72,9 +80,10 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
     """
     X is the column that has the data
 
-    orthogonal vector is a baseline vector that we want to make the columns of X orthogonal to. 
+    orthogonal vector is a baseline vector that we want to make the columns of
+    X orthogonal to.
 
-    skip column_to_skip if possible. 
+    skip column_to_skip if possible.
     """
 
     # first check to make sure that the matrix and vector have similar lengths
@@ -83,22 +92,18 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
         raise ValueError('Need to be the same shape')
 
     for column in range(X.shape[1]):
-
         # you might want to skip the constant column
         # for interactions, you don't actually have them in the data
         # so you don't want to skip any column.
         if column == column_to_skip:
             continue
-
         orthogonal_column = get_orthogonal_vector(
             baseline_vector, X[:, column])
-
         X[:, column] = orthogonal_column
-
     return X
 
 
-def audit_model(estimator, input_dataframe, distance_metric="mse",
+def audit_model(predict, input_dataframe, distance_metric="mse",
                 direct_input_pertubation="constant median",
                 number_of_runs=5, include_interactions=False,
                 external_data_set=None):
@@ -107,31 +112,44 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
 
     input_dataframe -> dataframe with shape (n_samples, n_features)
 
-    distance_metric -> one of ["mse", "accuracy"], this 
-                variable defaults to regression. 
+    distance_metric -> one of ["mse", "accuracy"], this
+                variable defaults to regression.
 
-    direct_input_pertubation -> This is referring to how to zero out a 
+    direct_input_pertubation -> This is referring to how to zero out a
                             single variable. One of three different options
                             1) replace with a random constant value
                             2) replace with median constant value
-                            3) replace all values with a random permutation of the column. 
-                            options = [constant-zero, constant-median, global-permutation]
+                            3) replace all values with a random permutation of
+                               the column.  options = [constant-zero,
+                               constant-median, global-permutation]
 
-    number_of_runs -> number of runs to perform. 
+    number_of_runs -> number of runs to perform.
 
     external_data_set ->data that did not go into training the model, but
                         that you'd like to see what impact that data
                         has on the black box model.
 
                         (VERY IMPORTANT if enabled.)
-                        You need to make sure that number of rows in this dataframe
-                        matches that of the input data. This is because we'll be using 
-                        the input_dataframe as a foundational dataset and making the columns 
-                        of that matrix orthogonal to each of the different columns in this
-                        data frame to check their influence. 
+                        You need to make sure that number of rows in this
+                        dataframe matches that of the input data. This is
+                        because we'll be using the input_dataframe as a
+                        foundational dataset and making the columns of that
+                        matrix orthogonal to each of the different columns in
+                        this data frame to check their influence.
 
 
     """
+    assert isinstance(input_dataframe, pd.DataFrame), ("Data must be a pandas "
+                                                       "dataframe")
+    assert distance_metric in ["mse", "accuracy"], ("Distance metric must be "
+                                                    "'mse' or 'accuracy'")
+
+    if not isinstance(direct_input_pertubation, six.callable):
+        try:
+            direct_input_pertubation = some_dictionary[direct_input_pertubation]
+        except KeyError:
+            raise Exception("Invalid selection for direct_input_pertubation. "
+                            "Must be callable or one of {}".format(", ".join(some_dictionary.keys())))
 
     # create output dictionaries
     direct_pertubation_feature_output_dictionary = defaultdict(list)
@@ -147,8 +165,6 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
     # verify data set and black_box editor.
     _, list_of_column_names = verify_input_data(input_dataframe)
 
-    print(list_of_column_names)
-
     # convert data to numpy array
     data = input_dataframe.values
 
@@ -157,22 +173,17 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
 
     # perform the straight forward linear search at first
     for current_iteration in range(number_of_runs):
-        
         random_row_to_select = randint(0, data.shape[0]-1)
         random_sample_selected = data[random_row_to_select, :]
 
         # go over every column
         for col in range(number_of_features):
-
             # get reference vector
             reference_vector = data[:, col]
-
             data_col_ptb = replace_column_of_matrix(np.copy(data),
                                                     col, random_sample_selected,
-                                                    perturbation_strategy="constant-zero")
-
+                                                    perturbation_strategy=direct_input_pertubation )
             output_constant_col = estimator.predict(data_col_ptb)
-
             if distance_metric == "accuracy":
                 output_difference_col = accuracy(
                     output_constant_col, normal_black_box_output)
@@ -202,7 +213,8 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
             complete_perturbation_dictionary[
                 list_of_column_names[col]].append(total_difference)
 
-    return complete_perturbation_dictionary, direct_pertubation_feature_output_dictionary
+    return (AuditResult(complete_perturbation_dictionary),
+            direct_pertubation_feature_output_dictionary)
 
 
 def main():

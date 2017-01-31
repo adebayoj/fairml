@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import sys
 
 
@@ -29,14 +28,12 @@ def verify_black_box_estimator(estimator, number_of_features,
         # check to make sure that the estimator returns a numpy
         # array
         if type(output).__module__ != 'numpy':
-            print(
-                "Output of estimator's predict is not a numpy array")
-
-            raise
+            raise ValueError("Output of estimator's predict is not "
+                             "a numpy array")
 
         if output.shape[0] != number_of_data_points:
-            print("Predict does not return an output for every data point.")
-            raise
+            raise Exception("Predict does not return an output "
+                            "for every data point.")
     except:
         print("Unexpected error: ", sys.exc_info()[0])
 
@@ -67,10 +64,6 @@ def verify_input_data(input_dataframe):
 
     # no input values, now check column names
     return True, list(input_dataframe.columns)
-
-
-def verify_external_dataframe(input_dataframe, external_dataframe):
-    pass
 
 
 def main():
