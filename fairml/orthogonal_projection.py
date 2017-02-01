@@ -138,16 +138,14 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
     complete_perturbation_dictionary = defaultdict(list)
 
     # check if estimator has predict function
-    number_of_features = input_dataframe.shape[1]
-
     # if check then test estimator for prediction and numpy variable return.
     # It'll raise errors if there are issues with passed in estimator.
+    number_of_features = input_dataframe.shape[1]
+
     _ = verify_black_box_estimator(estimator, number_of_features)
 
     # verify data set and black_box editor.
     _, list_of_column_names = verify_input_data(input_dataframe)
-
-    print(list_of_column_names)
 
     # convert data to numpy array
     data = input_dataframe.values
@@ -157,7 +155,7 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
 
     # perform the straight forward linear search at first
     for current_iteration in range(number_of_runs):
-        
+
         random_row_to_select = randint(0, data.shape[0]-1)
         random_sample_selected = data[random_row_to_select, :]
 
@@ -167,9 +165,10 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
             # get reference vector
             reference_vector = data[:, col]
 
-            data_col_ptb = replace_column_of_matrix(np.copy(data),
-                                                    col, random_sample_selected,
-                                                    perturbation_strategy="constant-zero")
+            data_col_ptb = replace_column_of_matrix(
+                np.copy(data),
+                col, random_sample_selected,
+                perturbation_strategy="constant-zero")
 
             output_constant_col = estimator.predict(data_col_ptb)
 
@@ -187,8 +186,10 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
             # now make all the remaining columns of the matrix $data_copy_with_constant_column$
             # except $col$ orthogonal to current vector of interest.
 
-            total_ptb_data = obtain_orthogonal_transformed_matrix(data_col_ptb,
-                                                                  reference_vector, column_to_skip=col)
+            total_ptb_data = obtain_orthogonal_transformed_matrix(
+                data_col_ptb,
+                reference_vector,
+                column_to_skip=col)
 
             total_transformed_output = estimator.predict(total_ptb_data)
 
@@ -202,7 +203,8 @@ def audit_model(estimator, input_dataframe, distance_metric="mse",
             complete_perturbation_dictionary[
                 list_of_column_names[col]].append(total_difference)
 
-    return complete_perturbation_dictionary, direct_pertubation_feature_output_dictionary
+    return (complete_perturbation_dictionary,
+            direct_pertubation_feature_output_dictionary)
 
 
 def main():

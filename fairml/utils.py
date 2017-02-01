@@ -46,11 +46,10 @@ def replace_column_of_matrix(X, column_number, random_sample,
     """
 
     # need to implement random permutation.
-
     if column_number >= random_sample.shape[0]:
         raise ValueError("column {} entered. Column # should be"
-                         "less than {}".format(column_number, random_sample.shape[0]))
-
+                         "less than {}".format(column_number,
+                                               random_sample.shape[0]))
     if perturbation_strategy == "constant-zero":
         value_chosen = 0.0
     elif perturbation_strategy == "constant-median":
