@@ -1,22 +1,21 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-#  import specific projection format.
-from fairml import audit_model
+import numpy as np
 
+# import specific projection format.
+from fairml import audit_model
 
 # read in propublica data
 propublica_data = pd.read_csv(
-    filepath_or_buffer=("./doc/example_notebooks/"
-                        "propublica_data_for_fairml.csv"),
+    filepath_or_buffer="./doc/example_notebooks/"
+    "propublica_data_for_fairml.csv",
     sep=",",
-    header=0
-)
+    header=0)
 
-#  quick processing
+# quick processing
 compas_rating = propublica_data.score_factor.values
 propublica_data = propublica_data.drop("score_factor", 1)
-
 
 #  quick setup of Logistic regression
 #  perhaps use a more crazy classifier
