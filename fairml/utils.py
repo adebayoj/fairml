@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 
 
 def mse(y, y_hat):
@@ -36,7 +35,7 @@ def accuracy(y, y_hat):
 
 
 def replace_column_of_matrix(X, column_number, random_sample,
-                             perturbation_strategy="constant-median"):
+                             perturbation_strategy):
     """
     Arguments: data matrix, n X k
     random sample: row of data matrix, 1 X k
@@ -46,21 +45,17 @@ def replace_column_of_matrix(X, column_number, random_sample,
     """
 
     # need to implement random permutation.
+    #need to implement perturbation strategy as a function
+    #need a distance metrics file. 
+    #this probably does not work right now, I need to go through to fix. 
     if column_number >= random_sample.shape[0]:
         raise ValueError("column {} entered. Column # should be"
-                         "less than {}".format(column_number,
-                                               random_sample.shape[0]))
-    if perturbation_strategy == "constant-zero":
-        value_chosen = 0.0
-    elif perturbation_strategy == "constant-median":
-        value_chosen = np.median(X[:, column_number])
-    else:
-        value_chosen = random_sample[column_number]
+                         "less than {}".format(column_number, random_sample.shape[0]))
+
+    value_chosen = perturbation_strategy(X, column_number, random_sample)
 
     constant_array = np.repeat(value_chosen, X.shape[0])
-
     X[:, column_number] = constant_array
-
     return X
 
 

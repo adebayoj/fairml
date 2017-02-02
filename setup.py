@@ -1,6 +1,5 @@
 from setuptools import setup
 
-
 setup(
     name='fairml',
     version='0.1.1.5',
