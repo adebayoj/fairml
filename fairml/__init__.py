@@ -1,1 +1,2 @@
 from .orthogonal_projection import audit_model
+from .graphing import plot_generic_dependence_dictionary

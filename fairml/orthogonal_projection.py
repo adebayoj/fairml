@@ -20,6 +20,12 @@ from .perturbation_strategies import perturbation_strategy_dictionary
 
 class AuditResult(dict):
 
+    def get_compress_dictionary_into_key_median(self):
+        new_compressed_dict = {}
+        for key, value in self.items():
+            new_compressed_dict[key] = np.median(np.array(value))
+        return new_compressed_dict
+
     def __repr__(self):
         output = []
         for key, value in self.items():
@@ -257,7 +263,6 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
         for current_iteration in number_of_runs:
     """
-
 
     return (AuditResult(complete_perturbation_dictionary),
             AuditResult(direct_pertubation_feature_output_dictionary))

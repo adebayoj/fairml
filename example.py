@@ -1,10 +1,10 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 # import specific projection format.
 from fairml import audit_model
+from fairml import plot_generic_dependence_dictionary
 
 # read in propublica data
 propublica_data = pd.read_csv(
@@ -13,7 +13,7 @@ propublica_data = pd.read_csv(
     sep=",",
     header=0)
 
-# quick processing
+# quick data processing
 compas_rating = propublica_data.score_factor.values
 propublica_data = propublica_data.drop("score_factor", 1)
 
@@ -33,6 +33,14 @@ total, _ = audit_model(
     external_data_set=None
 )
 
-#print feature importance
+# print feature importance
 print(total)
 
+# generate feature dependence plot
+_ = plot_generic_dependence_dictionary(
+    total.get_compress_dictionary_into_key_median(),
+    reverse_values=False,
+    title="FairML feature dependence",
+    save_path="fairml_propublica_linear_direct.eps",
+    show_plot=True
+)
