@@ -22,18 +22,17 @@ propublica_data = propublica_data.drop("score_factor", 1)
 clf = LogisticRegression(penalty='l2', C=0.01)
 clf.fit(propublica_data.values, compas_rating)
 
-#  double check list of input data columns
-print(list(propublica_data.columns))
-
-#  call
+#  call audit model
 total, _ = audit_model(
     clf.predict,
     propublica_data,
-    distance_metric="regression",
-    direct_input_pertubation="constant median",
+    distance_metric="mse",
+    direct_input_pertubation_strategy="constant-median",
     number_of_runs=10,
     include_interactions=False,
     external_data_set=None
 )
 
+#print feature importance
 print(total)
+

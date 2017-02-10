@@ -1,5 +1,8 @@
 import numpy as np
 
+# import dictionary with perturbation strategies.
+from .perturbation_strategies import perturbation_strategy_dictionary
+
 
 def mse(y, y_hat):
     """ function to calculate mse between to numpy vectors """
@@ -45,18 +48,40 @@ def replace_column_of_matrix(X, column_number, random_sample,
     """
 
     # need to implement random permutation.
-    #need to implement perturbation strategy as a function
-    #need a distance metrics file. 
-    #this probably does not work right now, I need to go through to fix. 
+    # need to implement perturbation strategy as a function
+    # need a distance metrics file.
+    # this probably does not work right now, I need to go through to fix.
     if column_number >= random_sample.shape[0]:
         raise ValueError("column {} entered. Column # should be"
-                         "less than {}".format(column_number, random_sample.shape[0]))
+                         "less than {}".format(column_number,
+                                               random_sample.shape[0]))
 
-    value_chosen = perturbation_strategy(X, column_number, random_sample)
+    # select the specific perturbation function chosen
+    # obtain value from that function
+    value_chosen = perturbation_strategy_dictionary[perturbation_strategy](X,
+                                                column_number, random_sample)
 
     constant_array = np.repeat(value_chosen, X.shape[0])
     X[:, column_number] = constant_array
+
     return X
+
+
+def detect_feature_sign(predict_function, X, col_num):
+
+    normal_output = predict_function(X)
+    column_range = X[:, col_num].max() - X[:, col_num].min()
+
+    X[:, col_num] = X[:, col_num] + np.repeat(column_range, X.shape[0])
+    new_output = predict_function(X)
+
+    diff = new_output - normal_output
+    total_diff = np.mean(diff)
+    
+    if total_diff >= 0: 
+        return 1
+    else:
+        return -1 
 
 
 def main():

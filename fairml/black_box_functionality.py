@@ -1,19 +1,13 @@
 import numpy as np
 import sys
+import six
 
-
-def verify_black_box_estimator(estimator, number_of_features,
+def verify_black_box_function(predict_method, number_of_features,
                                number_of_data_points=10):
 
-    # first check that estimator object has predict method
-    try:
-        predict_method = estimator.predict
-    except AttributeError:
-        print("Input estimator does not have a predict method")
-        raise
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        raise
+    # check estimator variable is a callable.  
+    if not six.callable(predict_method):                                        
+        raise Exception("Please pass in a callable.")
 
     # now generate test data to verify that estimator is working
     covariance = np.eye(number_of_features)
@@ -21,14 +15,13 @@ def verify_black_box_estimator(estimator, number_of_features,
 
     data = np.random.multivariate_normal(mean, covariance,
                                          number_of_data_points)
-
     try:
-        output = estimator.predict(data)
+        output = predict_method(data)
 
         # check to make sure that the estimator returns a numpy
         # array
         if type(output).__module__ != 'numpy':
-            raise ValueError("Output of estimator's predict is not "
+            raise ValueError("Output of predict function is not "
                              "a numpy array")
 
         if output.shape[0] != number_of_data_points:

@@ -8,14 +8,18 @@ import six
 from .utils import mse
 from .utils import accuracy
 from .utils import replace_column_of_matrix
-from .utils import constant_median
+from .utils import detect_feature_sign
 
 # black_box_functionality has functions to verify inputs.
-from .black_box_functionality import verify_black_box_estimator
+from .black_box_functionality import verify_black_box_function
 from .black_box_functionality import verify_input_data
+
+# import dictionary with perturbation strategies.
+from .perturbation_strategies import perturbation_strategy_dictionary
 
 
 class AuditResult(dict):
+
     def __repr__(self):
         output = []
         for key, value in self.items():
@@ -103,8 +107,8 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
     return X
 
 
-def audit_model(predict, input_dataframe, distance_metric="mse",
-                direct_input_pertubation="constant median",
+def audit_model(predict_function, input_dataframe, distance_metric="mse",
+                direct_input_pertubation_strategy="constant-zero",
                 number_of_runs=5, include_interactions=False,
                 external_data_set=None):
     """
@@ -115,7 +119,7 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
     distance_metric -> one of ["mse", "accuracy"], this
                 variable defaults to regression.
 
-    direct_input_pertubation -> This is referring to how to zero out a
+    direct_input_pertubation_strategy -> This is referring to how to zero out a
                             single variable. One of three different options
                             1) replace with a random constant value
                             2) replace with median constant value
@@ -143,24 +147,39 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
                                                        "dataframe")
     assert distance_metric in ["mse", "accuracy"], ("Distance metric must be "
                                                     "'mse' or 'accuracy'")
+    assert direct_input_pertubation_strategy in ["constant-zero",
+                                                 "constant-median",
+                                                 "random-sample"
+                                                 ],  ("Perturbation strategy "
+                                                      "must be one of: "
+                                                      "constant-zero, "
+                                                      "constant-median"
+                                                      "random-sample ")
 
-    if not isinstance(direct_input_pertubation, six.callable):
+    # either pass in a perturbation function for direct perturbation
+    # see perturbation functions
+    if not six.callable(direct_input_pertubation_strategy):
         try:
-            direct_input_pertubation = some_dictionary[direct_input_pertubation]
+            dtfp = perturbation_strategy_dictionary[
+                direct_input_pertubation_strategy]
         except KeyError:
-            raise Exception("Invalid selection for direct_input_pertubation. "
-                            "Must be callable or one of {}".format(", ".join(some_dictionary.keys())))
+            raise Exception("Invalid selection for direct_input_pertubation."
+                            "Must be callable or one of "
+                            "{}".format("-").join(
+                                perturbation_strategy_dictionary.keys()))
 
     # create output dictionaries
     direct_pertubation_feature_output_dictionary = defaultdict(list)
     complete_perturbation_dictionary = defaultdict(list)
+    interaction_perturbation_dictionary = defaultdict(list)
 
     # check if estimator has predict function
     # if check then test estimator for prediction and numpy variable return.
     # It'll raise errors if there are issues with passed in estimator.
     number_of_features = input_dataframe.shape[1]
 
-    _ = verify_black_box_estimator(estimator, number_of_features)
+    # verify the predict function
+    _ = verify_black_box_function(predict_function, number_of_features)
 
     # verify data set and black_box editor.
     _, list_of_column_names = verify_input_data(input_dataframe)
@@ -169,7 +188,7 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
     data = input_dataframe.values
 
     # get the normal output
-    normal_black_box_output = estimator.predict(data)
+    normal_black_box_output = predict_function(data)
 
     # perform the straight forward linear search at first
     for current_iteration in range(number_of_runs):
@@ -185,7 +204,7 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
                 col,
                 random_sample_selected,
                 perturbation_strategy="constant-zero")
-            output_constant_col = estimator.predict(data_col_ptb)
+            output_constant_col = predict_function(data_col_ptb)
             if distance_metric == "accuracy":
                 output_difference_col = accuracy(
                     output_constant_col, normal_black_box_output)
@@ -205,7 +224,7 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
                 reference_vector,
                 column_to_skip=col)
 
-            total_transformed_output = estimator.predict(total_ptb_data)
+            total_transformed_output = predict_function(total_ptb_data)
 
             if distance_metric == "accuracy":
                 total_difference = accuracy(
@@ -216,7 +235,30 @@ def audit_model(predict, input_dataframe, distance_metric="mse",
 
             complete_perturbation_dictionary[
                 list_of_column_names[col]].append(total_difference)
-            
+
+    # figure out the sign of the different features
+    for cols in range(data.shape[1]):
+        sign = detect_feature_sign(predict_function,np.copy(data), cols)
+
+        dictionary_key = list_of_column_names[cols]
+
+        # TO DO - change this
+        # this is wasteful, need to apply the sign once to 
+        # summary statistic for each feature. 
+        # this works for now
+        for i in range(len(complete_perturbation_dictionary[dictionary_key])):
+            complete_perturbation_dictionary[dictionary_key][i] = \
+                    sign * complete_perturbation_dictionary[dictionary_key][i]
+
+
+    """
+    # search for interactions as well. 
+    if include_interactions:
+
+        for current_iteration in number_of_runs:
+    """
+
+
     return (AuditResult(complete_perturbation_dictionary),
             AuditResult(direct_pertubation_feature_output_dictionary))
 
