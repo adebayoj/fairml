@@ -41,6 +41,6 @@ _ = plot_generic_dependence_dictionary(
     total.get_compress_dictionary_into_key_median(),
     reverse_values=False,
     title="FairML feature dependence",
-    save_path="fairml_propublica_linear_direct.eps",
+    save_path="fairml_propublica_linear_direct.png",
     show_plot=True
 )
