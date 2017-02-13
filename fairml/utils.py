@@ -37,32 +37,33 @@ def accuracy(y, y_hat):
     return accuracy
 
 
-def replace_column_of_matrix(X, column_number, random_sample,
-                             perturbation_strategy):
+def replace_column_of_matrix(X, col_num, random_sample,
+                             ptb_strategy):
     """
     Arguments: data matrix, n X k
     random sample: row of data matrix, 1 X k
     column number: 0 <-> k-1
 
-    replace all elements of X[column number] X with random_sample[column_number]
+    replace all elements of X[column number] X
+    with random_sample[column_number]
     """
 
     # need to implement random permutation.
     # need to implement perturbation strategy as a function
     # need a distance metrics file.
     # this probably does not work right now, I need to go through to fix.
-    if column_number >= random_sample.shape[0]:
+    if col_num >= random_sample.shape[0]:
         raise ValueError("column {} entered. Column # should be"
-                         "less than {}".format(column_number,
+                         "less than {}".format(col_num,
                                                random_sample.shape[0]))
 
     # select the specific perturbation function chosen
     # obtain value from that function
-    value_chosen = perturbation_strategy_dictionary[perturbation_strategy](X,
-                                                column_number, random_sample)
-
-    constant_array = np.repeat(value_chosen, X.shape[0])
-    X[:, column_number] = constant_array
+    val_chosen = perturbation_strategy_dictionary[ptb_strategy](X,
+                                                                col_num,
+                                                                random_sample)
+    constant_array = np.repeat(val_chosen, X.shape[0])
+    X[:, col_num] = constant_array
 
     return X
 
@@ -77,15 +78,16 @@ def detect_feature_sign(predict_function, X, col_num):
 
     diff = new_output - normal_output
     total_diff = np.mean(diff)
-    
-    if total_diff >= 0: 
+
+    if total_diff >= 0:
         return 1
     else:
-        return -1 
+        return -1
 
 
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

@@ -1,10 +1,14 @@
-import numpy as np
 import matplotlib
+
+# temporary work around down to virtualenv
+# matplotlib issue.
 matplotlib.use('Agg')
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-plt.rcParams['figure.figsize']=(8,4)
+
+plt.rcParams['figure.figsize'] = (8, 4)
 sns.set_style("white",
               {"axes.facecolor": "1.0",
                'font.family': [u'sans-serif'],
@@ -34,17 +38,18 @@ def plot_generic_dependence_dictionary(dictionary_values,
 
     pos = np.arange(len(sorted_column_values))+.7
 
-  
-    def assign_colors_to_bars(array_values, 
-                             pos_influence=pos_color, 
-                            negative_influence=negative_color, 
-                            reverse=reverse_values):
-    
+    # rearrange this at some other point.
+    def assign_colors_to_bars(array_values,
+                              pos_influence=pos_color,
+                              negative_influence=negative_color,
+                              reverse=reverse_values):
+
         # if you want the colors to be reversed for positive
-        # and negative influences. 
+        # and negative influences.
         if reverse:
-            pos_influence, negative_influence = negative_influence, pos_influence
-        
+            pos_influence, negative_influence = (negative_influence,
+                                                 pos_influence)
+
         # could rewrite this as a lambda function
         # but I understand this better
         def map_x(x):
@@ -52,10 +57,8 @@ def plot_generic_dependence_dictionary(dictionary_values,
                 return pos_influence
             else:
                 return negative_influence
-        
         bar_colors = list(map(map_x, array_values))
         return bar_colors
-
 
     bar_colors = assign_colors_to_bars(coefficient_values, reverse=True)
     bar_colors = list(np.array(bar_colors)[index_sorted])
@@ -73,6 +76,4 @@ def plot_generic_dependence_dictionary(dictionary_values,
 
     if show_plot:
         plt.show()
-
-    # generic return
     return True

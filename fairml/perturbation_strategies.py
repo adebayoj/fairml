@@ -14,7 +14,7 @@ def random_sample(X, column_number, random_sample):
 
 
 perturbation_strategy_dictionary = {
-    'constant-zero' : constant_zero,
-    'constant-median' : constant_median,
-    'random-sample' : random_sample
+    'constant-zero': constant_zero,
+    'constant-median': constant_median,
+    'random-sample': random_sample
 }

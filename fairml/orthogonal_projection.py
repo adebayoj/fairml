@@ -166,7 +166,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
     # see perturbation functions
     if not six.callable(direct_input_pertubation_strategy):
         try:
-            dtfp = perturbation_strategy_dictionary[
+            _ = perturbation_strategy_dictionary[
                 direct_input_pertubation_strategy]
         except KeyError:
             raise Exception("Invalid selection for direct_input_pertubation."
@@ -177,7 +177,8 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
     # create output dictionaries
     direct_pertubation_feature_output_dictionary = defaultdict(list)
     complete_perturbation_dictionary = defaultdict(list)
-    interaction_perturbation_dictionary = defaultdict(list)
+
+    # interaction_perturbation_dictionary = defaultdict(list)
 
     # check if estimator has predict function
     # if check then test estimator for prediction and numpy variable return.
@@ -209,7 +210,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
                 np.copy(data),
                 col,
                 random_sample_selected,
-                perturbation_strategy="constant-zero")
+                ptb_strategy="constant-zero")
             output_constant_col = predict_function(data_col_ptb)
             if distance_metric == "accuracy":
                 output_difference_col = accuracy(
@@ -222,7 +223,8 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
             direct_pertubation_feature_output_dictionary[
                 list_of_column_names[col]].append(output_difference_col)
 
-            # now make all the remaining columns of the matrix $data_copy_with_constant_column$
+            # now make all the remaining columns of the matrix
+            # $data_copy_with_constant_column$
             # except $col$ orthogonal to current vector of interest.
 
             total_ptb_data = obtain_orthogonal_transformed_matrix(
@@ -244,25 +246,17 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
     # figure out the sign of the different features
     for cols in range(data.shape[1]):
-        sign = detect_feature_sign(predict_function,np.copy(data), cols)
+        sign = detect_feature_sign(predict_function, np.copy(data), cols)
 
         dictionary_key = list_of_column_names[cols]
 
         # TO DO - change this
-        # this is wasteful, need to apply the sign once to 
-        # summary statistic for each feature. 
+        # this is wasteful, need to apply the sign once to
+        # summary statistic for each feature.
         # this works for now
         for i in range(len(complete_perturbation_dictionary[dictionary_key])):
             complete_perturbation_dictionary[dictionary_key][i] = \
                     sign * complete_perturbation_dictionary[dictionary_key][i]
-
-
-    """
-    # search for interactions as well. 
-    if include_interactions:
-
-        for current_iteration in number_of_runs:
-    """
 
     return (AuditResult(complete_perturbation_dictionary),
             AuditResult(direct_pertubation_feature_output_dictionary))
@@ -270,6 +264,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()

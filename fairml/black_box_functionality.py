@@ -2,11 +2,12 @@ import numpy as np
 import sys
 import six
 
-def verify_black_box_function(predict_method, number_of_features,
-                               number_of_data_points=10):
 
-    # check estimator variable is a callable.  
-    if not six.callable(predict_method):                                        
+def verify_black_box_function(predict_method, number_of_features,
+                              number_of_data_points=10):
+
+    # check estimator variable is a callable.
+    if not six.callable(predict_method):
         raise Exception("Please pass in a callable.")
 
     # now generate test data to verify that estimator is working
@@ -35,10 +36,10 @@ def verify_black_box_function(predict_method, number_of_features,
 
 def verify_input_data(input_dataframe):
     """
-    This function assumes the black box estimator is working as required. 
-    Checks the dataframe to make sure there are no NANs. 
+    This function assumes the black box estimator is working as required.
+    Checks the dataframe to make sure there are no NANs.
 
-    Will extend to just read a csv in the future. 
+    Will extend to just read a csv in the future.
 
     returns :- list of columns (feature names)
     """
@@ -61,6 +62,7 @@ def verify_input_data(input_dataframe):
 
 def main():
     pass
+
 
 if __name__ == '__main__':
     main()
