@@ -9,7 +9,7 @@ FairML is a python toolbox auditing the machine learning models for bias.
 This repo contains the source code used as part of FairML
 
 
-### Abstract (Tentative)
+### Description
 
 Predictive models are increasingly been deployed for the purpose
 of determining access to services such as credit, insurance, and
