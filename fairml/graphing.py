@@ -30,13 +30,16 @@ def plot_generic_dependence_dictionary(dictionary_values,
     column_names = list(dictionary_values.keys())
     coefficient_values = list(dictionary_values.values())
     coefficient_values = (
-        np.array(coefficient_values)/np.array(coefficient_values).max())*100
+        np.array(coefficient_values) / (
+            np.array(
+                coefficient_values).max()) * 100
+    )
 
     index_sorted = np.argsort(np.array(coefficient_values))
     sorted_column_names = list(np.array(column_names)[index_sorted])
     sorted_column_values = list(np.array(coefficient_values)[index_sorted])
 
-    pos = np.arange(len(sorted_column_values))+.7
+    pos = np.arange(len(sorted_column_values)) + 0.7
 
     # rearrange this at some other point.
     def assign_colors_to_bars(array_values,

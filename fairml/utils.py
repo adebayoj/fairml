@@ -32,7 +32,7 @@ def accuracy(y, y_hat):
     y = np.reshape(y, (y.shape[0],))
 
     equal = (y == y_hat)
-    accuracy = np.sum(equal)/y.shape[0]
+    accuracy = np.sum(equal) / y.shape[0]
 
     return accuracy
 

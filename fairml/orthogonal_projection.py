@@ -55,7 +55,7 @@ def get_parallel_vector(v1, v2):
     if v1.shape[0] != v2.shape[0]:
         return "Error, both vectors are not of the same length"
 
-    scaling = np.dot(v1, v2)/np.dot(v1, v1)
+    scaling = np.dot(v1, v2) / np.dot(v1, v1)
     parallel_v2 = (scaling * v1)
     return parallel_v2
 
@@ -80,7 +80,7 @@ def get_orthogonal_vector(v1, v2):
     if v1.shape[0] != v2.shape[0]:
         return "Error, both vectors are not of the same length"
 
-    scaling = np.dot(v1, v2)/np.dot(v1, v1)
+    scaling = np.dot(v1, v2) / np.dot(v1, v1)
     orthogonal_v2 = v2 - (scaling * v1)
     return orthogonal_v2
 
@@ -156,11 +156,11 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
     assert direct_input_pertubation_strategy in ["constant-zero",
                                                  "constant-median",
                                                  "random-sample"
-                                                 ],  ("Perturbation strategy "
-                                                      "must be one of: "
-                                                      "constant-zero, "
-                                                      "constant-median"
-                                                      "random-sample ")
+                                                 ], ("Perturbation strategy "
+                                                     "must be one of: "
+                                                     "constant-zero, "
+                                                     "constant-median"
+                                                     "random-sample ")
 
     # either pass in a perturbation function for direct perturbation
     # see perturbation functions
@@ -199,7 +199,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
     # perform the straight forward linear search at first
     for current_iteration in range(number_of_runs):
-        random_row_to_select = randint(0, data.shape[0]-1)
+        random_row_to_select = randint(0, data.shape[0] - 1)
         random_sample_selected = data[random_row_to_select, :]
 
         # go over every column
@@ -255,8 +255,8 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
         # summary statistic for each feature.
         # this works for now
         for i in range(len(complete_perturbation_dictionary[dictionary_key])):
-            complete_perturbation_dictionary[dictionary_key][i] = \
-                    sign * complete_perturbation_dictionary[dictionary_key][i]
+            complete_perturbation_dictionary[dictionary_key][i] = (
+                sign * complete_perturbation_dictionary[dictionary_key][i])
 
     return (AuditResult(complete_perturbation_dictionary),
             AuditResult(direct_pertubation_feature_output_dictionary))
