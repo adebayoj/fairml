@@ -35,3 +35,20 @@ def test_orthogonal_projection(number_of_tries=20, size=10000):
         # normal - uniform check
         ortho_d = get_orthogonal_vector(a, d)
         assert np.dot(ortho_d, a) < 1e-8
+
+
+def test_mse():
+    y_true = [3, -0.5, 2, 7]
+    y_pred = [2.5, 0.0, 2, 8]
+
+    test_mse = mse(y_true, y_pred)
+    assert test_mse == 0.375
+
+
+def test_accuracy():
+    y_pred = [0, 2, 1, 3]
+    y_true = [0, 1, 2, 3]
+
+    test_acc = accuracy(y_pred, y_true)
+    print(test_acc)
+    assert test_acc == 0.5
