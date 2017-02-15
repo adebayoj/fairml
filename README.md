@@ -11,8 +11,6 @@ FairML is a python toolbox auditing the machine learning models for bias.
 
 <img src="https://raw.githubusercontent.com/adebayoj/fairml/master/doc/images/logo2.png" width="700">
 
-This repo contains the source code used as part of FairML
-
 
 ### Description
 
