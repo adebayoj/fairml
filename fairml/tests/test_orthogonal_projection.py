@@ -14,6 +14,16 @@ from fairml.utils import detect_feature_sign
 
 from fairml.perturbation_strategies import constant_zero
 
+# let's define a black-box function
+def black_box_function(X_data):
+    weights = np.array([5, -10, 2])
+    weights = weights.reshape((len(weights), 1))
+
+    if not (input_data.shape[1] == weights.shape[0]):
+        raise Exception("problem, misaligned dimensions")
+
+    output = np.dot(X_data, weights)
+    return output
 
 def test_orthogonal_projection(number_of_tries=20, size=10000):
     """Orthogonal projection function. """
