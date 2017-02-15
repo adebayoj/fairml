@@ -27,6 +27,13 @@ def black_box_function(X_data):
     return output
 
 
+def generate_linear_data(weights, number_of_samples=1000):
+    mean = np.zeros(len(weights))
+    cov = np.eye(len(weights))
+    data = np.random.multivariate_normal(mean, cov, 1000)
+    return data
+
+
 def test_orthogonal_projection(number_of_tries=20, size=10000):
     """Orthogonal projection function. """
     for i in range(number_of_tries):
