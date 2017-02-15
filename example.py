@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression
 
 # import specific projection format.
 from fairml import audit_model
-from fairml import plot_generic_dependence_dictionary
+from fairml import plot_dependencies
 
 # read in propublica data
 propublica_data = pd.read_csv(
@@ -37,7 +37,7 @@ total, _ = audit_model(
 print(total)
 
 # generate feature dependence plot
-_ = plot_generic_dependence_dictionary(
+_ = plot_dependencies(
     total.get_compress_dictionary_into_key_median(),
     reverse_values=False,
     title="FairML feature dependence",

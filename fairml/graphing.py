@@ -19,13 +19,13 @@ sns.set_style("white",
               )
 
 
-def plot_generic_dependence_dictionary(dictionary_values,
-                                       pos_color="#3DE8F7",
-                                       negative_color="#ff4d4d",
-                                       reverse_values=False,
-                                       title="",
-                                       save_path="",
-                                       show_plot=True):
+def plot_dependencies(dictionary_values,
+                      pos_color="#3DE8F7",
+                      negative_color="#ff4d4d",
+                      reverse_values=False,
+                      title="",
+                      save_path="",
+                      show_plot=True):
 
     column_names = list(dictionary_values.keys())
     coefficient_values = list(dictionary_values.values())

@@ -118,7 +118,7 @@ total, _ = audit_model(
 print(total)
 
 # generate feature dependence plot
-_ = plot_generic_dependence_dictionary(
+_ = plot_dependencies(
     total.get_compress_dictionary_into_key_median(),
     reverse_values=False,
     title="FairML feature dependence",
