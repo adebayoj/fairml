@@ -1,3 +1,7 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import pytest
 import numpy as np
 from random import randint
@@ -76,6 +80,7 @@ def test_accuracy():
     y_true = [0, 1, 2, 3]
 
     test_acc = accuracy(y_pred, y_true)
+    print(test_acc)
     assert test_acc == 0.5
 
 
