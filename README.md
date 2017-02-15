@@ -1,5 +1,10 @@
 ========
 
+[![Build Status](https://travis-ci.org/adebayoj/fairml.svg?branch=master)](https://travis-ci.org/adebayoj/fairml/)
+[![Coverage Status](https://coveralls.io/repos/github/adebayoj/fairml/badge.svg?branch=master)](https://coveralls.io/github/adebayoj/fairml?branch=master)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/adebayoj/fairml/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/adebayoj/fairml.svg)](https://github.com/adebayoj/fairml/issues)
+
 FairML: Auditing Black-Box Predictive Models
 =====================
 FairML is a python toolbox auditing the machine learning models for bias. 
