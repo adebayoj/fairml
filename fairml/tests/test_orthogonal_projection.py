@@ -30,14 +30,7 @@ def black_box_function(X_data):
 def generate_linear_data(weights, number_of_samples=1000):
     mean = np.zeros(len(weights))
     cov = np.eye(len(weights))
-    data = np.random.multivariate_normal(mean, cov, 1000)
-    return data
-
-
-def generate_linear_data(weights, number_of_samples=1000):
-    mean = np.zeros(len(weights))
-    cov = np.eye(len(weights))
-    data = np.random.multivariate_normal(mean, cov, 1000)
+    data = np.random.multivariate_normal(mean, cov, number_of_samples)
     return data
 
 
