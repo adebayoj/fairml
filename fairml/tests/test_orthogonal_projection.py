@@ -34,15 +34,6 @@ def black_box_function(input_data):
     return output
 
 
-def test_constant_zero():
-
-    random_row_to_select = randint(0, data.shape[0] - 1)
-    random_sample_selected = data[random_row_to_select, :]
-
-    for i in range(data.shape[1]):
-        assert constant_zero(data, i, random_sample_selected) == 0.0
-
-
 def test_orthogonal_projection(number_of_tries=20, size=10000):
     """Orthogonal projection function. """
     for i in range(number_of_tries):
