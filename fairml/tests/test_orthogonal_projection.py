@@ -41,6 +41,17 @@ def generate_linear_data(weights, number_of_samples=1000):
     return data
 
 
+def test_constant_zero():
+
+    X = generate_linear_data([1, 1, 1], number_of_samples=100)
+
+    random_row_to_select = randint(0, X.shape[0] - 1)
+    random_sample_selected = X[random_row_to_select, :]
+
+    for i in range(X.shape[1]):
+        assert constant_zero(X, i, random_sample_selected) == 0.0
+
+
 def test_orthogonal_projection(number_of_tries=20, size=10000):
     """Orthogonal projection function. """
     for i in range(number_of_tries):
