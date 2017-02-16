@@ -15,34 +15,32 @@ from fairml.utils import detect_feature_sign
 from fairml.perturbation_strategies import constant_zero
 
 
-# let's define a black-box function
-def black_box_function(X_data):
-    weights = np.array([5, -10, 2])
-    weights = weights.reshape((len(weights), 1))
+# simulate data and test it.
+np.set_printoptions(suppress=True)
+number_of_features = 10
+number_of_samples = 1000
+weights = np.random.uniform(-10, 30, number_of_features)
+weights = weights.reshape((weights.shape[0], 1))
+cov = np.eye(number_of_features)
+mean = np.zeros(number_of_features)
+data = np.random.multivariate_normal(mean, cov, number_of_samples)
 
+
+# let's define a black-box function
+def black_box_function(input_data):
     if not (input_data.shape[1] == weights.shape[0]):
         raise Exception("problem, misaligned dimensions")
-
-    output = np.dot(X_data, weights)
+    output = np.dot(input_data, weights)
     return output
-
-
-def generate_linear_data(weights, number_of_samples=1000):
-    mean = np.zeros(len(weights))
-    cov = np.eye(len(weights))
-    data = np.random.multivariate_normal(mean, cov, number_of_samples)
-    return data
 
 
 def test_constant_zero():
 
-    X = generate_linear_data([1, 1, 1], number_of_samples=100)
+    random_row_to_select = randint(0, data.shape[0] - 1)
+    random_sample_selected = data[random_row_to_select, :]
 
-    random_row_to_select = randint(0, X.shape[0] - 1)
-    random_sample_selected = X[random_row_to_select, :]
-
-    for i in range(X.shape[1]):
-        assert constant_zero(X, i, random_sample_selected) == 0.0
+    for i in range(data.shape[1]):
+        assert constant_zero(data, i, random_sample_selected) == 0.0
 
 
 def test_orthogonal_projection(number_of_tries=20, size=10000):
