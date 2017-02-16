@@ -15,17 +15,6 @@ from fairml.utils import detect_feature_sign
 from fairml.perturbation_strategies import constant_zero
 
 
-# simulate data and test it.
-np.set_printoptions(suppress=True)
-number_of_features = 10
-number_of_samples = 1000
-weights = np.random.uniform(-10, 30, number_of_features)
-weights = weights.reshape((weights.shape[0], 1))
-cov = np.eye(number_of_features)
-mean = np.zeros(number_of_features)
-data = np.random.multivariate_normal(mean, cov, number_of_samples)
-
-
 # let's define a black-box function
 def black_box_function(input_data):
     if not (input_data.shape[1] == weights.shape[0]):
