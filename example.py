@@ -27,7 +27,7 @@ total, _ = audit_model(
     clf.predict,
     propublica_data,
     distance_metric="mse",
-    direct_input_pertubation_strategy="constant-median",
+    direct_input_pertubation_strategy="constant-zero",
     number_of_runs=10,
     include_interactions=False,
     external_data_set=None

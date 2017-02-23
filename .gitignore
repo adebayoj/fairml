@@ -1,3 +1,6 @@
+#ignore the output png that example.py produces
+feature_dependence_plot_fairml_propublica_linear_direct.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
