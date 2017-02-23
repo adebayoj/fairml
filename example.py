@@ -23,7 +23,7 @@ clf = LogisticRegression(penalty='l2', C=0.01)
 clf.fit(propublica_data.values, compas_rating)
 
 #  call audit model
-total, _ = audit_model(
+importancies, _ = audit_model(
     clf.predict,
     propublica_data,
     distance_metric="mse",
@@ -34,13 +34,15 @@ total, _ = audit_model(
 )
 
 # print feature importance
-print(total)
+print(importancies)
 
 # generate feature dependence plot
 _ = plot_dependencies(
-    total.get_compress_dictionary_into_key_median(),
+    importancies.get_compress_dictionary_into_key_median(),
     reverse_values=False,
-    title="FairML feature dependence",
+    title="FairML feature dependence logistic regression model",
     save_path="fairml_propublica_linear_direct.png",
     show_plot=True
 )
+
+# let's build more complicated models.
