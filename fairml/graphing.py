@@ -27,13 +27,19 @@ def plot_dependencies(dictionary_values,
                       save_path="",
                       show_plot=True):
 
+    # add check to make sure that dependence features are not zeros
+    if np.sum(np.array(dictionary_values.values())) == 0.0:
+        print("Feature dependence for all attributes equal zero."
+              " There is nothing to plot here. ")
+        return None
+
     column_names = list(dictionary_values.keys())
     coefficient_values = list(dictionary_values.values())
-    coefficient_values = (
-        np.array(coefficient_values) / (
-            np.array(
-                coefficient_values).max()) * 100
-    )
+
+    # get maximum
+    maximum_value = np.absolute(np.array(coefficient_values)).max()
+    coefficient_values = ((np.array(coefficient_values) / maximum_value) * 100
+                          )
 
     index_sorted = np.argsort(np.array(coefficient_values))
     sorted_column_names = list(np.array(column_names)[index_sorted])
