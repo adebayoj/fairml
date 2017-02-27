@@ -35,6 +35,18 @@ discriminatory extent) of such a model. With FairML, analysts can
 more easily audit cumbersome predictive models that are
 difficult to interpret.s of black-box algorithms and corresponding input data.
 
+### Installation 
+
+You can pip install this package, via github - i.e. this repo - using the 
+following commands:
+
+pip install https://github.com/adebayoj/fairml/archive/master.zip
+
+or you can clone the repository doing:
+
+git clone https://github.com/adebayoj/fairml.git
+
+sudo python setup.py install
 
 ### Methodology
 
