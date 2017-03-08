@@ -1,23 +1,18 @@
--- interactions
+-demo for  interactions
 
--- signs 
+-- include signs for non independent data
 
--- quick bar graphs
+-- separate the direct and indirect influence of a variable
 
--- quick testing. 
+-- make it clear that this allows for indirect influence because it accounts
+   extra perturbation due to correlation.
 
-
+-- improve testing coverage.
 
 --logging
     https://stackoverflow.com/questions/15727420/using-python-logging-in-multiple-modules
 
--- interaction terms
-
--- read about this grammar.py
-
--- testing 
-
--- more testing
+-- demo the grammar module
 
 
 
