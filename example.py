@@ -15,7 +15,7 @@ from fairml import audit_model
 from fairml import plot_dependencies
 
 plt.style.use('ggplot')
-plt.rcParams['figure.figsize'] = (6, 6)
+plt.rcParams['figure.figsize'] = (5, 5)
 
 # read in propublica data
 propublica_data = pd.read_csv("./doc/example_notebooks/"
