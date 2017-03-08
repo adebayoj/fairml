@@ -91,9 +91,7 @@ Above, we provide a quick explanation of the key fairml functionality. Now we mo
 # read in the propublica data to be used for our analysis.
 propublica_data = pd.read_csv(
     filepath_or_buffer="./doc/example_notebooks/"
-    "propublica_data_for_fairml.csv",
-    sep=",",
-    header=0)
+    "propublica_data_for_fairml.csv")
 
 # create feature and design matrix for model building.
 compas_rating = propublica_data.score_factor.values
@@ -116,27 +114,18 @@ Now let's audit the model built with FairML.
 ```python
 
 #  call audit model with model
-total, _ = audit_model(
-    clf.predict,
-    propublica_data,
-    distance_metric="mse",
-    direct_input_pertubation_strategy="constant-median",
-    number_of_runs=10,
-    include_interactions=False,
-    external_data_set=None
-)
+total, _ = audit_model(clf.predict, propublica_data)
 
 # print feature importance
 print(total)
 
 # generate feature dependence plot
-_ = plot_dependencies(
+fig = plot_dependencies(
     total.get_compress_dictionary_into_key_median(),
     reverse_values=False,
-    title="FairML feature dependence",
-    save_path="fairml_propublica_linear_direct.eps",
-    show_plot=True
+    title="FairML feature dependence"
 )
+plt.savefig("fairml_ldp.eps", transparent=False, bbox_inches='tight')
 ```
 
 The demo above produces the figure below. 
@@ -152,7 +141,4 @@ Feel free to email the authors with any questions:
 
 The data used for the demo above is available in the repo at: 
 /doc/example_notebooks/propublica_data_for_fairml.csv
-
-
-
 
