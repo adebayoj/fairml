@@ -24,7 +24,7 @@ from .perturbation_strategies import perturbation_strategy_dictionary
 
 class AuditResult(dict):
 
-    def get_compress_dictionary_into_key_median(self):
+    def median(self):
         new_compressed_dict = {}
         for key, value in self.items():
             new_compressed_dict[key] = np.median(np.array(value))
@@ -119,7 +119,7 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
 
 def audit_model(predict_function, input_dataframe, distance_metric="mse",
                 direct_input_pertubation_strategy="constant-zero",
-                number_of_runs=5, include_interactions=False,
+                number_of_runs=10, include_interactions=False,
                 external_data_set=None):
     """
     Estimator -> Black-box function that has a predict method

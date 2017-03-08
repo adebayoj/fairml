@@ -30,13 +30,12 @@ from fairml import audit_model
 from fairml import plot_dependencies
 
 plt.style.use('ggplot')
+plt.rcParams['figure.figsize'] = (8, 8)
 
 # set hyperparameter print verbosity for sklear
 _VERBOSITY = 2
 _RF_iterations = 2
 
-# set plotting parameters
-plt.rcParams['figure.figsize'] = (8, 4)
 
 """
 sns.set_style("white",
@@ -52,10 +51,7 @@ sns.set_style("white",
 # read in propublica data
 propublica_data = pd.read_csv(
     filepath_or_buffer="./doc/example_notebooks/"
-    "propublica_data_for_fairml.csv",
-    sep=",",
-    header=0)
-
+    "propublica_data_for_fairml.csv")
 
 # quick data processing
 compas_rating = propublica_data.score_factor.values
@@ -185,21 +181,15 @@ for key in classifiers_dict:
 
     importancies, _ = audit_model(
         classifiers_dict[key].predict,
-        propublica_data,
-        distance_metric="mse",
-        direct_input_pertubation_strategy="constant-zero",
-        number_of_runs=10,
-        include_interactions=False,
-        external_data_set=None
-    )
+        propublica_data)
 
     # generate feature dependence plot
     _ = plot_dependencies(
-        importancies.get_compress_dictionary_into_key_median(),
+        importancies.median(),
         reverse_values=False,
-        title="FairML feature dependence for {} model".format(key),
-        save_path="{}_feature_dependence_model.png".format(key),
-        show_plot=True
+        title="FairML feature dependence for {} model".format(key)
     )
 
+    file_name = "{}_feature_dependence_model.png".format(key)
+    plt.savefig(file_name, transparent=False, bbox_inches='tight', dpi=250)
     plt.clf()

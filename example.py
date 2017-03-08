@@ -1,17 +1,25 @@
-import pandas as pd
+import matplotlib
+
+# temporary work around down to virtualenv
+# matplotlib issue.
+matplotlib.use('Agg')
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 # import specific projection format.
 from fairml import audit_model
 from fairml import plot_dependencies
 
+plt.style.use('ggplot')
+plt.rcParams['figure.figsize'] = (8, 8)
+
 # read in propublica data
-propublica_data = pd.read_csv(
-    filepath_or_buffer="./doc/example_notebooks/"
-    "propublica_data_for_fairml.csv",
-    sep=",",
-    header=0)
+propublica_data = pd.read_csv("./doc/example_notebooks/"
+                              "propublica_data_for_fairml.csv")
 
 # quick data processing
 compas_rating = propublica_data.score_factor.values
@@ -23,26 +31,17 @@ clf = LogisticRegression(penalty='l2', C=0.01)
 clf.fit(propublica_data.values, compas_rating)
 
 #  call audit model
-importancies, _ = audit_model(
-    clf.predict,
-    propublica_data,
-    distance_metric="mse",
-    direct_input_pertubation_strategy="constant-zero",
-    number_of_runs=10,
-    include_interactions=False,
-    external_data_set=None
-)
+importancies, _ = audit_model(clf.predict, propublica_data)
 
 # print feature importance
 print(importancies)
 
 # generate feature dependence plot
-_ = plot_dependencies(
-    importancies.get_compress_dictionary_into_key_median(),
+fig = plot_dependencies(
+    importancies.median(),
     reverse_values=False,
-    title="FairML feature dependence logistic regression model",
-    save_path="fairml_propublica_linear_direct.png",
-    show_plot=True
+    title="FairML feature dependence logistic regression model"
 )
 
-# let's build more complicated models.
+file_name = "fairml_propublica_linear_direct.png"
+plt.savefig(file_name, transparent=False, bbox_inches='tight', dpi=250)

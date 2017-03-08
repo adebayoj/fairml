@@ -8,24 +8,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-plt.rcParams['figure.figsize'] = (8, 4)
-sns.set_style("white",
-              {"axes.facecolor": "1.0",
-               'font.family': [u'sans-serif'],
-               'ytick.color': '0.25',
-               'grid.color': '.8',
-               'axes.grid': False,
-               }
-              )
+plt.rcParams['figure.figsize'] = (8, 8)
+plt.style.use('ggplot')
 
 
 def plot_dependencies(dictionary_values,
                       pos_color="#3DE8F7",
                       negative_color="#ff4d4d",
                       reverse_values=False,
-                      title="",
-                      save_path="",
-                      show_plot=True):
+                      title=""):
 
     # add check to make sure that dependence features are not zeros
     if np.sum(np.array(dictionary_values.values())) == 0.0:
@@ -69,6 +60,8 @@ def plot_dependencies(dictionary_values,
         bar_colors = list(map(map_x, array_values))
         return bar_colors
 
+    fig = plt.figure(1)
+
     bar_colors = assign_colors_to_bars(coefficient_values, reverse=True)
     bar_colors = list(np.array(bar_colors)[index_sorted])
 
@@ -79,10 +72,4 @@ def plot_dependencies(dictionary_values,
     if title:
         plt.title("{}".format(title))
 
-    if save_path:
-        path = "feature_dependence_plot_{}".format(save_path)
-        plt.savefig(path, transparent=False, bbox_inches='tight', dpi=250)
-
-    if show_plot:
-        plt.show()
-    return True
+    return fig
