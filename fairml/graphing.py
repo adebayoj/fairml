@@ -7,8 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-plt.rcParams['figure.figsize'] = (5, 5)
 plt.style.use('ggplot')
 
 
@@ -16,7 +14,8 @@ def plot_dependencies(dictionary_values,
                       pos_color="#3DE8F7",
                       negative_color="#ff4d4d",
                       reverse_values=False,
-                      title=""):
+                      title="",
+                      fig_size=(4, 4)):
 
     # add check to make sure that dependence features are not zeros
     if np.sum(np.array(dictionary_values.values())) == 0.0:
@@ -60,7 +59,7 @@ def plot_dependencies(dictionary_values,
         bar_colors = list(map(map_x, array_values))
         return bar_colors
 
-    fig = plt.figure(1)
+    fig = plt.figure(figsize=fig_size)
 
     bar_colors = assign_colors_to_bars(coefficient_values, reverse=True)
     bar_colors = list(np.array(bar_colors)[index_sorted])
