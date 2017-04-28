@@ -82,7 +82,7 @@ audit_model returns an overloaded dictionary where keys are the column names of 
 
 """
 from fairml import audit_model
-from fairml import plot_generic_dependence_dictionary
+from fairml import plot_dependencies
 ```
 
 Above, we provide a quick explanation of the key fairml functionality. Now we move into building an example model that we'd like to audit.
@@ -121,11 +121,11 @@ print(total)
 
 # generate feature dependence plot
 fig = plot_dependencies(
-    total.get_compress_dictionary_into_key_median(),
+    total.median(),
     reverse_values=False,
     title="FairML feature dependence"
 )
-plt.savefig("fairml_ldp.eps", transparent=False, bbox_inches='tight')
+fig.savefig("fairml_ldp.eps", transparent=False, bbox_inches='tight')
 ```
 
 The demo above produces the figure below. 
