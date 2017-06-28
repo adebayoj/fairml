@@ -13,7 +13,7 @@ def convert_to_rst(filename):
         import pypandoc
         long_description = pypandoc.convert(filename, 'rst')
         long_description = long_description.replace("\r", "")  # YOU  NEED THIS LINE
-    except OSError:
+    except ImportError, OSError:
         print("Pandoc not found. Long_description conversion failure.")
         import io
         # pandoc is not installed, fallback to using raw contents
@@ -24,7 +24,7 @@ def convert_to_rst(filename):
 
 setup(
     name='fairml',
-    version='0.1.1.5.rc07',
+    version='0.1.1.5.rc08',
     description=("Module for measuring feature dependence"
                  " for black-box models"),
     long_description=convert_to_rst('README.md'),
