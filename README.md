@@ -35,16 +35,24 @@ difficult to interpret.s of black-box algorithms and corresponding input data.
 
 ### Installation 
 
-You can pip install this package, via github - i.e. this repo - using the 
-following commands:
+#### Recommended
 
-pip install https://github.com/adebayoj/fairml/archive/master.zip
+You can install the latest stable version via PyPI:
 
-or you can clone the repository doing:
+`pip install fairml`
 
-git clone https://github.com/adebayoj/fairml.git
+#### Bleeding Edge
 
-sudo python setup.py install
+If you are intested in potentially less stable bleeding edge version, install directly from github:
+
+- `pip install https://github.com/adebayoj/fairml/archive/master.zip`
+
+#### Development
+
+If you are a developer and prefer to install via a clone:
+
+1. `git clone https://github.com/adebayoj/fairml.git`
+2. `sudo python setup.py install`
 
 ### Methodology
 
