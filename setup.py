@@ -1,10 +1,33 @@
 from setuptools import setup
 
+
+def convert_to_rst(filename):
+    """
+    Nice markdown to .rst hack. PyPI needs .rst.
+    
+    Uses pandoc to convert the README.md
+    
+    From https://coderwall.com/p/qawuyq/use-markdown-readme-s-in-python-modules
+    """
+    try:
+        import pypandoc
+        long_description = pypandoc.convert(filename, 'rst')
+        long_description = long_description.replace("\r", "")  # YOU  NEED THIS LINE
+    except OSError:
+        print("Pandoc not found. Long_description conversion failure.")
+        import io
+        # pandoc is not installed, fallback to using raw contents
+        with io.open(filename, encoding="utf-8") as f:
+            long_description = f.read()
+
+    return long_description
+
 setup(
     name='fairml',
-    version='0.1.1.5',
+    version='0.1.1.5.rc07',
     description=("Module for measuring feature dependence"
                  " for black-box models"),
+    long_description=convert_to_rst('README.md'),
     url='https://github.com/adebayoj/fairml',
     author='Julius Adebayo',
     author_email='julius.adebayo@gmail.com',
