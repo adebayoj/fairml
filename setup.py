@@ -18,5 +18,15 @@ setup(
         'seaborn>=0.7.1',
         'pandas>=0.19.0'],
     include_package_data=True,
-    zip_safe=False
+    zip_safe=False,
+    classifiers=[
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Intended Audience :: Developers',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
 )
