@@ -12,7 +12,7 @@ def convert_to_rst(filename):
     try:
         import pypandoc
         long_description = pypandoc.convert(filename, 'rst')
-        long_description = long_description.replace("\r", "")  # YOU  NEED THIS LINE
+        long_description = long_description.replace("\r", "")
     except (ImportError, OSError):
         print("Pandoc not found. Long_description conversion failure.")
         import io
