@@ -1,16 +1,13 @@
-========
+# FairML: Auditing Black-Box Predictive Models
+
+FairML is a python toolbox auditing the machine learning models for bias.
 
 [![Build Status](https://travis-ci.org/adebayoj/fairml.svg?branch=master)](https://travis-ci.org/adebayoj/fairml/)
 [![Coverage Status](https://coveralls.io/repos/github/adebayoj/fairml/badge.svg?branch=master)](https://coveralls.io/github/adebayoj/fairml?branch=master)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/adebayoj/fairml/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/adebayoj/fairml.svg)](https://github.com/adebayoj/fairml/issues)
 
-FairML: Auditing Black-Box Predictive Models
-=====================
-FairML is a python toolbox auditing the machine learning models for bias. 
-
-<img src="https://raw.githubusercontent.com/adebayoj/fairml/master/doc/images/logo2.png" width="700">
-
+![Logo](fairml/master/doc/images/logo2-small.png)
 
 ### Description
 
@@ -20,10 +17,11 @@ employment. Despite societal gains in efficiency and
 productivity through deployment of these models, potential 
 systemic flaws have not been fully addressed, particularly the
 potential for unintentional discrimination. This discrimination
-could be on the basis of race, gender, religion, sexual orientation, or other characteristics. This project addresses
-the question: how can an analyst determine the relative
-significance of the inputs to a black-box predictive model in 
-order to assess the model’s fairness (or discriminatory extent)?
+could be on the basis of race, gender, religion, sexual orientation,
+or other characteristics. This project addresses the question:
+how can an analyst determine the relative significance of the inputs
+to a black-box predictive model in order to assess the model’s
+fairness (or discriminatory extent)?
 
 We present FairML, an end-to-end toolbox for auditing predictive
 models by quantifying the relative significance of the model’s
@@ -37,21 +35,28 @@ difficult to interpret.s of black-box algorithms and corresponding input data.
 
 ### Installation 
 
-You can pip install this package, via github - i.e. this repo - using the 
-following commands:
+#### Recommended
 
-pip install https://github.com/adebayoj/fairml/archive/master.zip
+You can install the latest stable version via PyPI:
 
-or you can clone the repository doing:
+`pip install fairml`
 
-git clone https://github.com/adebayoj/fairml.git
+#### Bleeding Edge
 
-sudo python setup.py install
+If you are intested in potentially less stable bleeding edge version, install directly from github:
+
+- `pip install https://github.com/adebayoj/fairml/archive/master.zip`
+
+#### Development
+
+If you are a developer and prefer to install via a clone:
+
+1. `git clone https://github.com/adebayoj/fairml.git`
+2. `sudo python setup.py install`
 
 ### Methodology
 
-
-<img src="https://github.com/adebayoj/fairml/blob/master/doc/images/fairml_methodology_picture.png" width="700">
+![Methodology](fairml/doc/images/fairml_methodology_picture.png)
 
 ### Code Demo
 
@@ -59,10 +64,8 @@ Now we show how to use the fairml python package to audit
 a black-box model.
 
 ```python
-"""
-First we import modules for model building and data
-processing.
-"""
+# First we import modules for model building and data processing.
+
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -78,14 +81,16 @@ audit_model takes:
   - number_of_runs : number of iterations to perform
   - interactions : flag to enable checking model dependence on interactions.
 
-audit_model returns an overloaded dictionary where keys are the column names of input pandas dataframe and values are lists containing model  dependence on that particular feature. These lists of size number_of_runs.
+audit_model returns an overloaded dictionary where keys are the column names of input pandas dataframe and values are
+    lists containing model  dependence on that particular feature. These lists of size number_of_runs.
 
 """
 from fairml import audit_model
 from fairml import plot_generic_dependence_dictionary
 ```
 
-Above, we provide a quick explanation of the key fairml functionality. Now we move into building an example model that we'd like to audit.
+Above, we provide a quick explanation of the key fairml functionality. Now we move into building an example model that
+we'd like to audit.
 
 ```python
 # read in the propublica data to be used for our analysis.
@@ -130,12 +135,11 @@ plt.savefig("fairml_ldp.eps", transparent=False, bbox_inches='tight')
 
 The demo above produces the figure below. 
 
-<img src="https://raw.githubusercontent.com/adebayoj/fairml/master/doc/images/feature_dependence_plot_fairml_propublica_linear_direct.png" width="700">
+![Example Output](fairml/master/doc/images/feature_dependence_plot_fairml_propublica_linear_direct_small.png)
 
 
 Feel free to email the authors with any questions:  
-[Julius Adebayo](https://github.com/adebayoj) (julius.adebayo@gmail.com)   
-
+[Julius Adebayo GitHub](https://github.com/adebayoj) [julius.adebayo@gmail.com](mailto:julius.adebayo@gmail.com)
 
 ### Data
 
