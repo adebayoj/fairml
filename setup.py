@@ -4,9 +4,9 @@ from setuptools import setup
 def convert_to_rst(filename):
     """
     Nice markdown to .rst hack. PyPI needs .rst.
-    
+
     Uses pandoc to convert the README.md
-    
+
     From https://coderwall.com/p/qawuyq/use-markdown-readme-s-in-python-modules
     """
     try:
