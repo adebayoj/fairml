@@ -45,7 +45,7 @@ def get_parallel_vector(v1, v2):
     ------------
 
     v1 - baseline vector (numpy)
-    v2 - vector that you'd like to make parrallel to v1
+    v2 - vector that you'd like to make parallel to v1
 
     Returns
     -------------
@@ -118,7 +118,7 @@ def obtain_orthogonal_transformed_matrix(X, baseline_vector,
 
 
 def audit_model(predict_function, input_dataframe, distance_metric="mse",
-                direct_input_pertubation_strategy="constant-zero",
+                direct_input_perturbation_strategy="constant-zero",
                 number_of_runs=10, include_interactions=False,
                 external_data_set=None):
     """
@@ -129,7 +129,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
     distance_metric -> one of ["mse", "accuracy"], this
                 variable defaults to regression.
 
-    direct_input_pertubation_strategy -> This is referring to how to zero out a
+    direct_input_perturbation_strategy -> This is referring to how to zero out a
                             single variable. One of three different options
                             1) replace with a random constant value
                             2) replace with median constant value
@@ -157,7 +157,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
                                                        "dataframe")
     assert distance_metric in ["mse", "accuracy"], ("Distance metric must be "
                                                     "'mse' or 'accuracy'")
-    assert direct_input_pertubation_strategy in ["constant-zero",
+    assert direct_input_perturbation_strategy in ["constant-zero",
                                                  "constant-median",
                                                  "random-sample"
                                                  ], ("Perturbation strategy "
@@ -168,18 +168,18 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
     # either pass in a perturbation function for direct perturbation
     # see perturbation functions
-    if not six.callable(direct_input_pertubation_strategy):
+    if not six.callable(direct_input_perturbation_strategy):
         try:
             _ = perturbation_strategy_dictionary[
-                direct_input_pertubation_strategy]
+                direct_input_perturbation_strategy]
         except KeyError:
-            raise Exception("Invalid selection for direct_input_pertubation."
+            raise Exception("Invalid selection for direct_input_perturbation."
                             "Must be callable or one of "
                             "{}".format("-").join(
                                 perturbation_strategy_dictionary.keys()))
 
     # create output dictionaries
-    direct_pertubation_feature_output_dictionary = defaultdict(list)
+    direct_perturbation_feature_output_dictionary = defaultdict(list)
     complete_perturbation_dictionary = defaultdict(list)
 
     # interaction_perturbation_dictionary = defaultdict(list)
@@ -224,7 +224,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
                     output_constant_col, normal_black_box_output)
 
             # store independent output by themselves
-            direct_pertubation_feature_output_dictionary[
+            direct_perturbation_feature_output_dictionary[
                 list_of_column_names[col]].append(output_difference_col)
 
             # now make all the remaining columns of the matrix
@@ -263,7 +263,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
                 sign * complete_perturbation_dictionary[dictionary_key][i])
 
     return (AuditResult(complete_perturbation_dictionary),
-            AuditResult(direct_pertubation_feature_output_dictionary))
+            AuditResult(direct_perturbation_feature_output_dictionary))
 
 
 def main():
