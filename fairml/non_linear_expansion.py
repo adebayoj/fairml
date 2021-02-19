@@ -21,7 +21,7 @@ def return_non_linear_transformation(v1, poly, log, square_root,
             A = np.append(A, current_power, axis=1)
 
     if square_root:
-        sqrt = np.sqrt(v1 + nb.abs(min(v1)) + 1)
+        sqrt = np.sqrt(v1 + np.abs(min(v1)) + 1)
         sqrt = np.reshape(sqrt, (sqrt.shape[0], 1))
         A = np.append(A, sqrt, axis=1)
 
