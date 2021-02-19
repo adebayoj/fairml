@@ -61,7 +61,7 @@ def plot_dependencies(dictionary_values,
 
     fig = plt.figure(figsize=fig_size)
 
-    bar_colors = assign_colors_to_bars(coefficient_values, reverse=True)
+    bar_colors = assign_colors_to_bars(coefficient_values, reverse=reverse_values)
     bar_colors = list(np.array(bar_colors)[index_sorted])
 
     plt.barh(pos, sorted_column_values, align='center', color=bar_colors)
