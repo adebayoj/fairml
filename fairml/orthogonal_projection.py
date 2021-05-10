@@ -11,6 +11,7 @@ import six
 # import a few utility functions
 from .utils import mse
 from .utils import accuracy
+from .utils import gini
 from .utils import replace_column_of_matrix
 from .utils import detect_feature_sign
 
@@ -126,7 +127,7 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
     input_dataframe -> dataframe with shape (n_samples, n_features)
 
-    distance_metric -> one of ["mse", "accuracy"], this
+    distance_metric -> one of ["mse", "accuracy", "gini"], this
                 variable defaults to regression.
 
     direct_input_pertubation_strategy -> This is referring to how to zero out a
@@ -155,8 +156,8 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
     """
     assert isinstance(input_dataframe, pd.DataFrame), ("Data must be a pandas "
                                                        "dataframe")
-    assert distance_metric in ["mse", "accuracy"], ("Distance metric must be "
-                                                    "'mse' or 'accuracy'")
+    assert distance_metric in ["mse", "accuracy", "gini"], ("Distance metric must be "
+                                                    "'mse', 'accuracy' or 'gini'")
     assert direct_input_pertubation_strategy in ["constant-zero",
                                                  "constant-median",
                                                  "random-sample"
@@ -219,6 +220,9 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
             if distance_metric == "accuracy":
                 output_difference_col = accuracy(
                     output_constant_col, normal_black_box_output)
+            elif distance_metric == "gini":
+                output_difference_col = gini(
+                    output_constant_col, normal_black_box_output)
             else:
                 output_difference_col = mse(
                     output_constant_col, normal_black_box_output)
@@ -240,6 +244,9 @@ def audit_model(predict_function, input_dataframe, distance_metric="mse",
 
             if distance_metric == "accuracy":
                 total_difference = accuracy(
+                    total_transformed_output, normal_black_box_output)
+            elif distance_metric == "gini":
+                total_difference = gini(
                     total_transformed_output, normal_black_box_output)
             else:
                 total_difference = mse(
