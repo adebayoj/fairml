@@ -10,6 +10,7 @@ from fairml.orthogonal_projection import get_orthogonal_vector
 
 from fairml.utils import mse
 from fairml.utils import accuracy
+from fairml.utils import gini
 from fairml.utils import detect_feature_sign
 
 from fairml.perturbation_strategies import constant_zero
@@ -60,3 +61,11 @@ def test_accuracy():
     test_acc = accuracy(y_pred, y_true)
     print(test_acc)
     assert test_acc == 0.5
+
+def test_gini():
+    y_pred = [0, 0, 0, 1]
+    y_true = [0, 0, 1, 1]
+
+    test_gini= gini(y_true, y_pred)
+    print(test_gini)
+    assert test_gini == 0.5

@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+from sklearn.metrics import roc_auc_score
 
 # import dictionary with perturbation strategies.
 from .perturbation_strategies import perturbation_strategy_dictionary
@@ -39,6 +40,22 @@ def accuracy(y, y_hat):
     accuracy = np.sum(equal) / y.shape[0]
 
     return accuracy
+
+def gini(y, y_hat):
+    """ function to calculate gini of y_hat given y"""
+    y = np.array(y)
+    y_hat = np.array(y_hat)
+
+    y = y.astype(int)
+    y_hat = y_hat.astype(float)
+
+    y_hat = np.reshape(y_hat, (y_hat.shape[0],))
+    y = np.reshape(y, (y.shape[0],))
+
+    ras = roc_auc_score(y, y_hat)
+    g = ras * 2 - 1
+
+    return g
 
 
 def replace_column_of_matrix(X, col_num, random_sample,
